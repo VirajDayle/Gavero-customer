@@ -3,3 +3,12 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
+
+@theme {
+  --color-background: #f8fafc;
+
+  --font-supermarcado: Super-Marcado;
+  --font-lato-bold: Lato-Bold;
+  --font-roboto-italic: Roboto-Bold;
+  --font-sans-regular: Sans-Regular;
+}
