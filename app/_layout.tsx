@@ -1,3 +1,4 @@
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
@@ -26,10 +27,20 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
+  const MyTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: "#ffffff", // This makes ALL screens default to pure white!
+    },
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <Slot />
+        <ThemeProvider value={MyTheme}>
+          <Slot />
+        </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

@@ -197,7 +197,7 @@ export default function OtpScreen() {
         >
           {/* Header */}
           <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 18, fontWeight: "700", color: "#111827" }}>
+            <Text className="text-xl font-semibold text-gray-800">
               Verify your number
             </Text>
             <Text style={{ fontSize: 13, color: "#9CA3AF", lineHeight: 18 }}>

@@ -44,7 +44,7 @@ export default function TermsSheet() {
         {/* Header — direct child of SafeAreaView, sibling of ScrollView */}
         <View style={styles.header}>
           <View style={styles.headerText}>
-            <Text style={styles.title}>{title}</Text>
+            <Text className="title-subheading">{title}</Text>
             <Text style={styles.subtitle}>Last updated: May 11, 2026</Text>
           </View>
 
@@ -133,11 +133,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
+  // title: {
+  //   fontSize: 18,
+  //   fontWeight: "700",
+  //   color: "#1F2937",
+  // },
 
   subtitle: {
     fontSize: 11,

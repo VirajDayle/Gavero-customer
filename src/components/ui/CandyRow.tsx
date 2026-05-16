@@ -18,11 +18,11 @@
 import clsx from "clsx";
 import { useEffect, useMemo, useRef } from "react";
 import {
-    Animated,
-    Easing,
-    Image,
-    ImageSourcePropType,
-    View,
+  Animated,
+  Easing,
+  Image,
+  ImageSourcePropType,
+  View,
 } from "react-native";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
