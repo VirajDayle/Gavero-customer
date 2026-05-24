@@ -145,7 +145,7 @@ export default function Index() {
               By continuing, you agree to our{" "}
               <Link
                 href={{
-                  pathname: "/(app)/(public)/TermSheet",
+                  pathname: "/(app)/(public)/term-sheet",
                   params: { type: "termsAndServices" },
                 }}
               >
@@ -156,7 +156,7 @@ export default function Index() {
               and{" "}
               <Link
                 href={{
-                  pathname: "/(app)/(public)/TermSheet",
+                  pathname: "/(app)/(public)/term-sheet",
                   params: { type: "privacyPolicy" },
                 }}
               >

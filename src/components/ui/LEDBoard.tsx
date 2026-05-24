@@ -31,8 +31,9 @@ function useAirportTypewriter(enabled: boolean, lines: string[]) {
 }
 
 function LEDBoard({ lines, className }: LEDBoardProps) {
-  const scaleAnim = useRef(new Animated.Value(0.82)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+  const translateYAnim = useRef(new Animated.Value(-40)).current;
   const [visible, setVisible] = useState(false);
   const cursorOpacity = useRef(new Animated.Value(1)).current;
   const { line1, line2, done } = useAirportTypewriter(visible, lines);
@@ -41,16 +42,22 @@ function LEDBoard({ lines, className }: LEDBoardProps) {
     const t = setTimeout(() => {
       setVisible(true);
       Animated.parallel([
-        Animated.spring(scaleAnim, {
+        Animated.timing(scaleAnim, {
           toValue: 1,
-          tension: 140,
-          friction: 10,
+          duration: 600,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateYAnim, {
+          toValue: -74,
+          duration: 600,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 350,
-          easing: Easing.out(Easing.ease),
+          duration: 600,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
       ]).start();
@@ -64,18 +71,24 @@ function LEDBoard({ lines, className }: LEDBoardProps) {
       Animated.parallel([
         Animated.timing(opacityAnim, {
           toValue: 0,
-          duration: 100,
+          duration: 250,
           easing: Easing.in(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(scaleAnim, {
-          toValue: 0.88,
-          duration: 100,
+          toValue: 0.95,
+          duration: 250,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateYAnim, {
+          toValue: -84,
+          duration: 250,
           easing: Easing.in(Easing.ease),
           useNativeDriver: true,
         }),
       ]).start();
-    }, 5000);
+    }, 3000);
     return () => clearTimeout(t);
   }, [done]);
 
@@ -102,7 +115,7 @@ function LEDBoard({ lines, className }: LEDBoardProps) {
     <Animated.View
       className={clsx("absolute left-6 right-6 z-20", className)}
       style={{
-        transform: [{ translateY: -74 }, { scale: scaleAnim }],
+        transform: [{ translateY: translateYAnim }, { scale: scaleAnim }],
         opacity: opacityAnim,
       }}
     >

@@ -5,7 +5,7 @@ const Layout = () => {
   return (
     <Stack>
       <Stack.Screen
-        name="completeProfile"
+        name="complete-profile"
         options={{
           headerShown: false,
           statusBarStyle: "dark",

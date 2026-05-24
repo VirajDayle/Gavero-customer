@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.viraj29.customer"
+      "bundleIdentifier": "com.viraj29.customer",
+      "config": {
+        "googleMapsApiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +25,12 @@
       "softwareKeyboardLayoutMode": "pan",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.viraj29.customer"
+      "package": "com.viraj29.customer",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc"
+        }
+      }
     },
     "web": {
       "output": "static",
@@ -51,6 +59,26 @@
             "src/assets/fonts/Roboto-BoldItalic.ttf",
             "src/assets/fonts/GoogleSans-Regular.ttf"
           ]
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc",
+          "iosGoogleMapsApiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Gavero to access your location."
+        }
+      ],
+      "react-native-edge-to-edge",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow Gavero to access your contacts."
         }
       ]
     ],

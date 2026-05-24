@@ -23,7 +23,7 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
-        name="TermSheet"
+        name="term-sheet"
         options={{
           headerShown: false,
           presentation: "formSheet",
@@ -35,6 +35,33 @@ const Layout = () => {
           sheetGrabberVisible: false, // ← hide grabber so user isn't confused
         }}
       />
+      <Stack.Screen
+        name="map-address"
+        options={{
+          headerShown: false,
+          statusBarStyle: "dark",
+        }}
+      />
+      <Stack.Screen
+        name="address-details"
+        options={{
+          headerShown: false,
+          statusBarStyle: "dark",
+        }}
+      />
+      <Stack.Screen
+        name="search-shops"
+        options={{
+          headerShown: false,
+          statusBarStyle: "dark",
+        }}
+      />
+      <Stack.Screen
+      name="shop-page"
+      options={{
+        headerShown: false,
+        statusBarStyle: "light"
+      }}/>
     </Stack>
   );
 };

@@ -68,7 +68,7 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="categeories"
+        name="categories"
         options={{
           title: "Categeories",
           headerShown: false,

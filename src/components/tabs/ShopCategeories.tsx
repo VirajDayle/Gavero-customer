@@ -1,5 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import clsx from "clsx";
+import { router } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -27,7 +28,10 @@ interface CategoryChipProps {
 
 const CategoryChip = ({ item }: CategoryChipProps) => {
   return (
-    <Pressable className="items-center">
+    <Pressable
+      className="items-center"
+      onPress={() => router.push("/(app)/(public)/search-shops")}
+    >
       {({ pressed }) => (
         <>
           <Image

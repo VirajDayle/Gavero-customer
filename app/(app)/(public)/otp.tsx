@@ -169,7 +169,7 @@ export default function OtpScreen() {
       return; // ← remove the second setTimeout entirely
     }
 
-    router.replace("/(app)/(auth)/completeProfile");
+    router.replace("/(app)/(auth)/complete-profile");
   };
 
   const maskedPhone = phone

@@ -1,7 +1,10 @@
+import { LABEL_ICONS } from "@/src/constants/location";
+import { getCurrentRegion } from "@/src/utils/location/currentRegion";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { router } from "expo-router";
-import React from "react";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
@@ -36,13 +39,6 @@ interface AddressDropdownProps {
 }
 
 // ─── Icon Map ─────────────────────────────────────────────────────────────────
-
-const LABEL_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  home: "home-outline",
-  work: "briefcase-outline",
-  office: "business-outline",
-  hotel: "bed-outline",
-};
 
 const getIcon = (label: string): keyof typeof Ionicons.glyphMap =>
   LABEL_ICONS[label.toLowerCase()] ?? "compass-outline";
@@ -121,6 +117,33 @@ const AddressDropdown = ({
   onDelete,
 }: AddressDropdownProps) => {
   const hasSaved = addresses.saved.length > 0;
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleNewAddress = async () => {
+    setIsLoading(true);
+
+    const currentRegion = await getCurrentRegion();
+
+    if (!currentRegion) {
+      setIsLoading(false);
+      return;
+    }
+
+    onClose();
+    setIsLoading(false);
+
+    router.push({
+      pathname: "/map-address",
+      params: {
+        latitude: currentRegion.latitude.toString(),
+        longitude: currentRegion.longitude.toString(),
+        latitudeDelta: currentRegion.latitudeDelta.toString(),
+        longitudeDelta: currentRegion.longitudeDelta.toString(),
+      },
+    });
+  };
 
   return (
     <Modal
@@ -130,7 +153,11 @@ const AddressDropdown = ({
       onRequestClose={onClose}
     >
       {/* Backdrop */}
-      <Pressable className="flex-1" onPress={onClose}>
+      <Pressable
+        className="flex-1"
+        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        onPress={onClose}
+      >
         {/* Shadow Wrapper */}
         <View
           className="absolute left-4 right-4 h-150"
@@ -176,8 +203,7 @@ const AddressDropdown = ({
               {/* Add Address */}
               <Pressable
                 onPress={() => {
-                  onClose();
-                  router.push("/(app)/selectAddress");
+                  handleNewAddress();
                 }}
                 className="mx-2 flex-row items-center justify-between rounded-xl bg-white px-2 py-3.5 active:opacity-70"
               >
@@ -188,7 +214,7 @@ const AddressDropdown = ({
                     color="#16A34A"
                   />
 
-                  <Text className="text-lg font-semibold tracking-wide text-[#16A34A]">
+                  <Text className="text-[16px] font-semibold tracking-wide text-[#16A34A]">
                     Add new address
                   </Text>
                 </View>
@@ -204,46 +230,53 @@ const AddressDropdown = ({
                   paddingBottom: 20,
                 }}
               >
-                {/* Active Address */}
-                {addresses.current && (
-                  <>
-                    <SectionLabel title="Active Address" />
-
-                    <AddressRow
-                      address={addresses.current}
-                      isActive
-                      onSelect={onSelect}
-                    />
-                  </>
-                )}
-
-                {/* Saved Addresses */}
-                {hasSaved && (
-                  <>
-                    <SectionLabel title="Saved Addresses" />
-
-                    {addresses.saved.map((address) => (
-                      <AddressRow
-                        key={address.id}
-                        address={address}
-                        onSelect={onSelect}
-                        onDelete={onDelete}
-                      />
-                    ))}
-                  </>
-                )}
-
-                {/* Empty State */}
-                {!addresses.current && !hasSaved && (
-                  <View style={styles.emptyState}>
-                    <Ionicons
-                      name="location-outline"
-                      size={32}
-                      color="#D1D5DB"
-                    />
-
-                    <Text style={styles.emptyText}>No addresses saved yet</Text>
+                {isLoading ? (
+                  <View className="items-center  z-10 m-10">
+                    <ActivityIndicator size={30} />
                   </View>
+                ) : (
+                  <>
+                    {addresses.current && (
+                      <>
+                        <SectionLabel title="Active Address" />
+
+                        <AddressRow
+                          address={addresses.current}
+                          isActive
+                          onSelect={onSelect}
+                        />
+                      </>
+                    )}
+
+                    {hasSaved && (
+                      <>
+                        <SectionLabel title="Saved Addresses" />
+
+                        {addresses.saved.map((address) => (
+                          <AddressRow
+                            key={address.id}
+                            address={address}
+                            onSelect={onSelect}
+                            onDelete={onDelete}
+                          />
+                        ))}
+                      </>
+                    )}
+
+                    {!addresses.current && !hasSaved && (
+                      <View style={styles.emptyState}>
+                        <Ionicons
+                          name="location-outline"
+                          size={32}
+                          color="#D1D5DB"
+                        />
+
+                        <Text style={styles.emptyText}>
+                          No addresses saved yet
+                        </Text>
+                      </View>
+                    )}
+                  </>
                 )}
               </ScrollView>
             </View>

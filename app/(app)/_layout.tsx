@@ -12,7 +12,7 @@ const RootNav = () => {
       <Stack.Screen name="(public)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
-        name="selectAddress"
+        name="select-address"
         options={{
           headerShown: false,
           presentation: "transparentModal", // ✅ correct
