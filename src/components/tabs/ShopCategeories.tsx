@@ -36,7 +36,7 @@ const CategoryChip = ({ item }: CategoryChipProps) => {
         <>
           <Image
             source={item.iconActive}
-            className={clsx("h-14 w-14", pressed && "opacity-90")}
+            className={clsx("h-11.5 w-11.5", pressed && "opacity-90")}
             resizeMode="contain"
           />
 

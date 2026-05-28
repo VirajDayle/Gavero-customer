@@ -5,6 +5,7 @@ import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -39,7 +40,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={MyTheme}>
-          <Slot />
+          <BottomSheetModalProvider>
+            <Slot />
+          </BottomSheetModalProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

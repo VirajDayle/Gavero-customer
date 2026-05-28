@@ -1,7 +1,7 @@
 import "@/global.css";
 import CandyRow from "@/src/components/ui/CandyRow";
 import LEDBoard from "@/src/components/ui/LEDBoard";
-import { ROW_SLICES } from "@/src/constants/candyData";
+import { ROW_SLICES } from "@/src/mockData/ui/candyData";
 import clsx from "clsx";
 import { Link, router } from "expo-router";
 import { styled } from "nativewind";

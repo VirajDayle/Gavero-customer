@@ -57,11 +57,26 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
-      name="shop-page"
-      options={{
-        headerShown: false,
-        statusBarStyle: "light"
-      }}/>
+        name="shop-page"
+        options={{
+          headerShown: false,
+          statusBarStyle: "dark",
+        }}
+      />
+      <Stack.Screen
+        name="shop-expand"
+        options={{
+          headerShown: false,
+          statusBarStyle: "dark",
+        }}
+      />
+      <Stack.Screen
+        name="expand-rows"
+        options={{
+          headerShown: false,
+          statusBarStyle: "dark",
+        }}
+      />
     </Stack>
   );
 };

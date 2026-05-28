@@ -1,130 +1,58 @@
+import type { ShopCategoryItem } from "@/src/types/category";
+import type { ShopType } from "@/src/types/shop";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import clsx from "clsx";
 import { router } from "expo-router";
-import React, { useRef, useState } from "react";
-import {
-  Image,
-  ImageSourcePropType,
-  LayoutChangeEvent,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useCallback, useRef } from "react";
+import { Image, LayoutChangeEvent, Pressable, Text, View } from "react-native";
+import Animated, {
+  clamp,
+  interpolate,
+  SharedValue,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+} from "react-native-reanimated";
 import SearchBar from "./SearchBar";
 
-export const SHOP_CATEGORIES = [
-  {
-    id: "1",
-    iconActive: require("@/src/assets/images/shopCategeory/groceryActive.png"),
-    title: "Grocery",
-  },
-  {
-    id: "3",
-    iconActive: require("@/src/assets/images/shopCategeory/restaurant.png"),
-    title: "Restaurant",
-  },
-  {
-    id: "2",
-    iconActive: require("@/src/assets/images/shopCategeory/bakeryActive.png"),
-    title: "Bakery",
-    isActive: true,
-  },
-  {
-    id: "4",
-    iconActive: require("@/src/assets/images/shopCategeory/pharmacy.png"),
-    title: "Pharmacy",
-  },
-  {
-    id: "5",
-    iconActive: require("@/src/assets/images/shopCategeory/stationary.png"),
-    title: "Stationary",
-  },
-  {
-    id: "7",
-    iconActive: require("@/src/assets/images/shopCategeory/cosmetics.png"),
-    title: "Cosmetics",
-  },
-  {
-    id: "8",
-    iconActive: require("@/src/assets/images/shopCategeory/petfood.png"),
-    title: "Petfood",
-  },
-  {
-    id: "9",
-    iconActive: require("@/src/assets/images/shopCategeory/fruits.png"),
-    title: "Fruits",
-  },
-];
-
-export const GROCERY_SHOP_IMAGES = [
-  { id: "1", source: require("@/src/assets/images/groceryShop/bewerages.png") },
-  {
-    id: "2",
-    source: require("@/src/assets/images/groceryShop/dairyandbread.png"),
-  },
-  { id: "3", source: require("@/src/assets/images/groceryShop/dal.png") },
-  {
-    id: "4",
-    source: require("@/src/assets/images/groceryShop/fruitsandvegitable.png"),
-  },
-  {
-    id: "5",
-    source: require("@/src/assets/images/groceryShop/grainsandstaple.png"),
-  },
-  { id: "6", source: require("@/src/assets/images/groceryShop/household.png") },
-  { id: "7", source: require("@/src/assets/images/groceryShop/icecream.png") },
-  {
-    id: "8",
-    source: require("@/src/assets/images/groceryShop/oilandghee.png"),
-  },
-  {
-    id: "9",
-    source: require("@/src/assets/images/groceryShop/snacksandbiscuit.png"),
-  },
-  { id: "10", source: require("@/src/assets/images/groceryShop/spices.png") },
-];
-
-type Item = {
-  id: string;
-  iconActive: ImageSourcePropType;
-  icon: ImageSourcePropType;
-  title: string;
-  isActive?: boolean;
-};
-
-interface ShopCategoriesProps {
-  className?: string;
-  items: Item[];
-}
-
 interface CategoryChipProps {
-  item: Item;
+  item: ShopCategoryItem;
+  isActive: boolean;
+  onPress: () => void;
 }
 
-const CategoryChip = ({ item }: CategoryChipProps) => {
+import { SHOP_CATEGORIES } from "@/src/mockData/shops/shopCategories";
+
+const CategoryChip = ({ item, isActive, onPress }: CategoryChipProps) => {
   return (
     <Pressable
       className={clsx(
-        "items-center justify-end w-18 h-16 rounded-t-2xl",
-        item.isActive
-          ? "border-t-[0.5] border-r-[0.5] border-l-[0.5]  border-[#C0C0C0] bg-[#ffe86d]"
-          : "border-b-[0.5] border-[#C0C0C0] bg-transparent",
+        "items-center justify-end w-18 h-17 rounded-t-2xl",
+        isActive
+          ? `border-t-[0.75] border-r-[0.75] border-l-[0.75] border-[#C0C0C0]`
+          : "bg-transparent",
       )}
-      onPress={() => router.push("/(app)/(public)/search-shops")}
+      style={{ backgroundColor: isActive ? item.color : "transparent" }}
+      onPress={onPress} // ← no router.push here anymore
     >
       {({ pressed }) => (
         <>
           <Image
             source={item.iconActive}
-            className={clsx("h-10 w-10", pressed && "opacity-90")}
+            className={clsx(
+              isActive ? "h-11 w-11" : "h-9 w-9",
+              pressed && "opacity-90",
+            )}
             resizeMode="contain"
           />
-
           <Text
-            className="text-label text-[10px] text-center"
+            className={clsx(
+              "text-[10px] text-center",
+              isActive
+                ? "font-bold text-gray-900"
+                : "font-medium text-gray-500",
+            )}
             numberOfLines={1}
           >
             {item.title}
@@ -134,148 +62,227 @@ const CategoryChip = ({ item }: CategoryChipProps) => {
     </Pressable>
   );
 };
-const ShopHeader = () => {
-  const insets = useSafeAreaInsets();
 
-  // Tracks the active chip's center X as a fraction of the list row width
-  const [gradientOriginX, setGradientOriginX] = useState(0.5);
-  const listContainerWidth = useRef(0);
+interface ShopHeaderProps {
+  scrollY: SharedValue<number>;
+  currentShop: ShopType; // ← read from parent
+  onShopChange: (shop: ShopType) => void; // ← write to parent
+  onLayout?: (e: LayoutChangeEvent) => void;
+}
 
-  const handleListLayout = (e: LayoutChangeEvent) => {
-    listContainerWidth.current = e.nativeEvent.layout.width;
-  };
+const ShopHeader = ({
+  scrollY,
+  currentShop,
+  onShopChange,
+  onLayout,
+}: ShopHeaderProps) => {
+  // Derive the active category item so we can read its color
+  const activeItem = SHOP_CATEGORIES.find((c) => c.title === currentShop);
 
-  const handleActiveChipLayout = (e: LayoutChangeEvent) => {
-    const { x, width } = e.nativeEvent.layout;
-    const containerWidth = listContainerWidth.current;
-    if (containerWidth > 0) {
-      // Center of the active chip as a fraction of the row width
-      const originX = (x + width / 2) / containerWidth;
-      setGradientOriginX(Math.max(0, Math.min(1, originX)));
-    }
-  };
+  const headerHeightSV = useSharedValue(0);
+  const hasMeasured = useRef(false);
+
+  const onBackgroundLayout = useCallback((e: LayoutChangeEvent) => {
+    if (hasMeasured.current) return;
+    headerHeightSV.value = e.nativeEvent.layout.height;
+    hasMeasured.current = true;
+  }, []);
+
+  const linearGradientYSV = useSharedValue(0);
+
+  const onViewLayout = useCallback((e: LayoutChangeEvent) => {
+    if (linearGradientYSV.value !== 0) return;
+    linearGradientYSV.value = e.nativeEvent.layout.y;
+  }, []);
+
+  // Single progress value (0 → 1) derived once on UI thread
+  // All animated styles read from this — no dynamic range recalculation per frame
+  const progress = useDerivedValue(() => {
+    if (headerHeightSV.value === 0) return 0;
+    return clamp(scrollY.value / headerHeightSV.value, 0, 1);
+  });
+
+  // Background fades out as user scrolls
+  const bgStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 1], [1, 0]),
+  }));
+
+  // Layer 3 translates up based on scroll, clamped to not exceed the background height + upper list offset
+  const layer3Style = useAnimatedStyle(() => {
+    if (headerHeightSV.value === 0) return { transform: [{ translateY: 0 }] };
+    const maxTranslate = headerHeightSV.value + linearGradientYSV.value + 2;
+    return {
+      transform: [{ translateY: -clamp(scrollY.value, 0, maxTranslate) }],
+    };
+  });
+
+  // Shop name fades out slightly earlier than the background
+  const textStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 0.6], [1, 0]),
+  }));
+
+  const stickyProgress = useDerivedValue(() => {
+    const maxTranslate = headerHeightSV.value + linearGradientYSV.value + 2;
+    if (maxTranslate === 0) return 0;
+    return clamp(scrollY.value / maxTranslate, 0, 1);
+  });
+
+  const backBtnStyle = useAnimatedStyle(() => {
+    return {
+      top: interpolate(stickyProgress.value, [0, 1], [0, 15]),
+    };
+  });
+
+  const searchBarStyle = useAnimatedStyle(() => {
+    return {
+      marginLeft: interpolate(stickyProgress.value, [0, 1], [0, 40]),
+    };
+  });
+
+  const borderStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(stickyProgress.value, [0.8, 1], [0, 1]),
+    };
+  });
+
+  const rootStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: scrollY.value < 0 ? -scrollY.value : 0,
+        },
+      ],
+    };
+  });
 
   return (
-    <View className="bg-[#fff6c5]">
-      <View style={{ marginTop: insets.top }}>
-        <View className={clsx("flex-row items-center justify-between px-3")}>
-          {/* Header */}
-          <View className="flex-row items-center">
-            <Pressable
-              onPress={() => router.back()}
-              className={clsx(
-                "w-9 h-9 rounded-full items-center justify-center active:opacity-60 p-1",
-              )}
-              hitSlop={8}
-            >
-              <Ionicons name="arrow-back" size={22} color="#1a1a1a" />
-            </Pressable>
-          </View>
-          <View className="flex-row items-center gap-2.5">
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons name="bookmark-outline" size={22} color="#111827" />
-            </Pressable>
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons name="share-outline" size={22} color="#111827" />
-            </Pressable>
-          </View>
-        </View>
+    <Animated.View
+      onLayout={onLayout}
+      pointerEvents="box-none"
+      style={[{ overflow: "hidden" }, rootStyle]}
+    >
+      {/* ── Layer 1: Background — fades out, never moves ── */}
+      <Animated.View
+        style={[{ zIndex: 0, backgroundColor: "#ffffff" }, bgStyle]}
+        pointerEvents="box-none"
+      >
+        <View onLayout={onBackgroundLayout} className="px-4">
+          {/* Top Row */}
+          <View className="flex-row items-center justify-between">
+            <View className="h-10 w-10" />
 
-        {/* Hero */}
-        <View className="flex-row px-3">
-          <View className="mt-1 h-16.5 w-16.5 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-50 mr-2">
-            <Image
-              source={require("@/src/assets/images/balajimart.png")}
-              className="h-full w-full"
-              resizeMode="cover"
-            />
+            <View className="flex-row items-center gap-2">
+              <Pressable className="h-10 w-10 items-center justify-center rounded-full">
+                <Ionicons name="heart-outline" size={22} color="#111827" />
+              </Pressable>
+              <Pressable className="h-10 w-10 items-center justify-center rounded-full">
+                <Ionicons name="share-outline" size={22} color="#111827" />
+              </Pressable>
+            </View>
           </View>
 
-          <View className="flex-1">
-            <Text className="text-gray-900 text-[22px] font-bold leading-6.5">
-              Mahakal kirana house
-            </Text>
-
-            <View className="flex-row items-center">
-              <View className="flex-row items-center  rounded-lg p-1 gap-1">
-                <Ionicons name="location-outline" className="text-[10px]" />
-                <Text className="text-[11px] font-medium text-gray-900">
-                  2 km
+          {/* Logo + Name + Rating */}
+          <View className="flex-row items-end justify-center overflow-hidden">
+            {/* Center Logo */}
+            <View className="items-center">
+              <View className="h-20 w-20 rounded-full overflow-hidden border border-gray-100">
+                <Image
+                  source={require("@/src/assets/images/balajimart.png")}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
+              </View>
+              <Animated.Text
+                className="text-[16px] font-semibold mx-5 text-wrap"
+                numberOfLines={2}
+                style={textStyle}
+              >
+                Balaji Mart And Restaurant
+              </Animated.Text>
+              <View className="px-1 py-px rounded-md justify-center">
+                <Text className="text-[12px] font-medium">
+                  Arrive in 20-25 min
                 </Text>
               </View>
-              <View className="h-1 w-1 rounded-full bg-gray-900 mx-2" />
+            </View>
 
-              <View className="flex-row items-center gap-1  p-1 rounded-lg">
-                <Ionicons name="time-outline" size={14} color="#4B5563" />
-                <Text className="text-[11px] font-medium text-gray-900">
-                  20-30 min
-                </Text>
+            {/* Rating */}
+            <View className="absolute right-0 top-1 items-center">
+              <View className="flex-row items-center rounded bg-green-700 px-1 py-px">
+                <Text className="text-xs font-bold text-white">4.5</Text>
+                <Ionicons
+                  name="star"
+                  size={10}
+                  color="#fcd34d"
+                  style={{ marginLeft: 2 }}
+                />
               </View>
-
-              <View className="h-1 w-1 rounded-full bg-gray-900 mx-2" />
-
-              <Text className="text-[11px] font-medium text-gray-900  p-1 rounded-lg">
-                Grocery
+              <Text className="mt-0.5 text-[8px] font-semibold text-center">
+                (108 Reviews)
               </Text>
             </View>
           </View>
         </View>
+      </Animated.View>
 
-        <View className="mt-5" onLayout={handleListLayout}>
+      {/* ── Layer 2/3: Everything below translates up ── */}
+      <Animated.View
+        style={[{ zIndex: 10, backgroundColor: "#ffffff" }, layer3Style]}
+        pointerEvents="box-none"
+      >
+        <View className="-mb-0.5 mt-3 z-10">
           <FlashList
             data={SHOP_CATEGORIES}
             horizontal
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingHorizontal: 0 }}
-            ItemSeparatorComponent={() => <View />}
+            contentContainerStyle={{
+              justifyContent: "center",
+              alignItems: "center",
+              flexGrow: 1,
+            }}
             renderItem={({ item }) => (
               <CategoryChip
                 item={item}
-                onActiveLayout={handleActiveChipLayout}
+                isActive={item.title === currentShop} // ← derived, not stored in item
+                onPress={() => onShopChange(item.title as ShopType)}
               />
             )}
           />
         </View>
-      </View>
 
-      {/* 
-        Gradient originates from the active chip's center X position.
-        - start.x = gradientOriginX (active chip center)
-        - end.x = 0.5 (spread to center-bottom for a natural fan)
-        - The Y axis goes from top (chip bottom) to bottom of header
-      */}
-      <LinearGradient
-        colors={["#ffe86d", "#ffe86d", "#f5d94f"]}
-        locations={[0, 0.4, 1]}
-        start={{ x: gradientOriginX, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-      >
-        <SearchBar
-          className="mt-10 mx-4"
-          placeholderText="search from balaji mart"
-        />
-        <View className="mt-4 mb-4 h-[90px]">
-          <FlashList
-            data={GROCERY_SHOP_IMAGES}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
-            ItemSeparatorComponent={() => <View className="w-3" />}
-            renderItem={({ item }) => (
-              <View className="h-20 w-20 overflow-hidden rounded-xl bg-white border border-gray-100 shadow-sm items-center justify-center">
-                <Image
-                  source={item.source}
-                  className="h-full w-full"
-                  resizeMode="cover"
-                />
-              </View>
-            )}
+        <View
+          onLayout={onViewLayout}
+          className="border-t-[0.75] border-[#C0C0C0]"
+          style={{ backgroundColor: activeItem?.color ?? "#B7ECCD" }}
+        >
+          <View className="px-4">
+            <Animated.View style={searchBarStyle}>
+              <SearchBar
+                className="mt-3 mb-2"
+                placeholderText="search from store"
+              />
+            </Animated.View>
+          </View>
+
+          {/* ── Animated Bottom Border ── */}
+          <Animated.View
+            style={borderStyle}
+            className="absolute -bottom-px left-0 right-0 h-px bg-gray-200"
           />
         </View>
-      </LinearGradient>
-    </View>
+      </Animated.View>
+
+      {/* ── Absolute Back Button ── */}
+      <Animated.View style={backBtnStyle} className="absolute z-20 left-4">
+        <Pressable
+          className="h-10 w-10 items-center justify-center rounded-full bg-white/40"
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={22} color="#111827" />
+        </Pressable>
+      </Animated.View>
+    </Animated.View>
   );
 };
 

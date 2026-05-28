@@ -1,5 +1,5 @@
 import { SELECT_ADDRESS } from "@/src/constants/selectAddress";
-import { SHOP_CATEGORIES } from "@/src/constants/shopCategeory";
+import { SHOP_CATEGORIES } from "@/src/mockData/shops/shopCategories";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import clsx from "clsx";
 import React, { useRef, useState } from "react";
@@ -78,7 +78,7 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
   }));
 
   return (
-    <View className={clsx(className, "px-4 pt-3 pb-4")}>
+    <View className={clsx(className, "px-4 pt-3 pb-1")}>
       {/* ── Collapsible top row (address + action icons) ── */}
       <Animated.View style={clipStyle}>
         <View

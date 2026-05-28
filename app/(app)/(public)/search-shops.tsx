@@ -13,7 +13,8 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
 import ShopCard from "@/src/components/ui/ShopCard";
-import { ACTIVE_SHOPS, ListItem, ShopItem } from "@/src/mockData/search-shops";
+import { ACTIVE_SHOPS } from "@/src/mockData/shops/searchShops";
+import type { ShopItem, SearchListItem } from "@/src/types/search";
 import { router } from "expo-router";
 
 const AnimatedFlashList = Animated.createAnimatedComponent(
@@ -39,7 +40,7 @@ const SearchShops = () => {
     const activeShops = shops.filter((shop) => !shop.isClosed);
     const closedShops = shops.filter((shop) => shop.isClosed);
 
-    const data: ListItem[] = [];
+    const data: SearchListItem[] = [];
 
     // Active Shops
     data.push({
@@ -87,12 +88,12 @@ const SearchShops = () => {
       <SearchShopsHeader progress={progress} />
 
       {/* <View className="border-b border-gray-100" /> */}
-
+      {/* Chnage this too in the component to render shop redirect page shop wise if want  */}
       <View className="flex-1">
         <AnimatedFlashList
           data={listData}
-          keyExtractor={(item: ListItem) => item.id}
-          getItemType={(item: ListItem) =>
+          keyExtractor={(item: SearchListItem) => item.id}
+          getItemType={(item: SearchListItem) =>
             "type" in item ? item.type : "shop"
           }
           ItemSeparatorComponent={({ leadingItem }: any) => {
@@ -100,17 +101,20 @@ const SearchShops = () => {
             return <View className="border-t border-gray-100" />;
           }}
           // ListHeaderComponent={ShopTopSections}
-          renderItem={({ item }: { item: ListItem }) => {
-            if ("type" in item && item.type === "header") {
-              return (
-                <View className="flex-row items-center pt-4 pb-2 px-1">
-                  <View className="mx-4 flex-row items-center gap-2">
-                    <Text className="text-[15.5px] font-bold text-gray-900 ">
-                      {item.title}
-                    </Text>
+          renderItem={({ item }: { item: SearchListItem }) => {
+            if ("type" in item) {
+              if (item.type === "header") {
+                return (
+                  <View className="flex-row items-center pt-4 pb-2 px-1">
+                    <View className="mx-4 flex-row items-center gap-2">
+                      <Text className="text-[15.5px] font-bold text-gray-900 ">
+                        {item.title}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              );
+                );
+              }
+              return null;
             }
 
             return (
@@ -128,7 +132,7 @@ const SearchShops = () => {
                 couponCode={item.couponCode}
                 isSaved={item.isSaved}
                 onSavePress={() => toggleSave(item.id)}
-                onPress={()=> router.push("/shop-page")}
+                onPress={() => router.push({ pathname: "/shop-page", params: { shopType: "Grocery" } })}
               />
             );
           }}

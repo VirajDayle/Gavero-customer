@@ -1,28 +1,23 @@
-export const SHOP_CATEGORIES = [
+import type { ShopCategoryItem } from "@/src/types/category";
+
+/**
+ * All top-level shop category tabs shown in ShopHeader.
+ * The `color` field is used as the active chip background in the header.
+ */
+export const SHOP_CATEGORIES: ShopCategoryItem[] = [
   {
     id: "1",
     iconActive: require("@/src/assets/images/shopCategeory/groceryActive.png"),
     icon: require("@/src/assets/images/shopCategeory/grocery.png"),
     title: "Grocery",
+    color: "#B7ECCD",
   },
   {
     id: "3",
     iconActive: require("@/src/assets/images/shopCategeory/restaurant.png"),
     icon: require("@/src/assets/images/shopCategeory/grocery.png"),
     title: "Restaurant",
-  },
-  {
-    id: "2",
-    iconActive: require("@/src/assets/images/shopCategeory/bakeryActive.png"),
-    icon: require("@/src/assets/images/shopCategeory/grocery.png"),
-    title: "Bakery",
-  },
-
-  {
-    id: "6",
-    iconActive: require("@/src/assets/images/shopCategeory/sweets.png"),
-    icon: require("@/src/assets/images/shopCategeory/grocery.png"),
-    title: "Sweets",
+    color: "#121212",
   },
   {
     id: "4",
@@ -47,11 +42,5 @@ export const SHOP_CATEGORIES = [
     iconActive: require("@/src/assets/images/shopCategeory/petfood.png"),
     icon: require("@/src/assets/images/shopCategeory/grocery.png"),
     title: "Petfood",
-  },
-  {
-    id: "9",
-    iconActive: require("@/src/assets/images/shopCategeory/fruits.png"),
-    icon: require("@/src/assets/images/shopCategeory/grocery.png"),
-    title: "Fruits",
   },
 ];

@@ -1,4 +1,4 @@
-import { TAB_ICONS } from "@/src/constants/tabs";
+import { TAB_ICONS } from "@/src/mockData/ui/tabs";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Image, View } from "react-native";

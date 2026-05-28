@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, Image, Text, View } from "react-native";
-import { BrandItem } from "@/src/mockData/search-shops";
+import type { BrandItem } from "@/src/types/search";
 
 interface HorizontalBrandsProps {
   brands: BrandItem[];

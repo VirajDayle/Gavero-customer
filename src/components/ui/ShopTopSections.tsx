@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { MOCK_BRANDS, MOCK_PRODUCTS } from "@/src/mockData/search-shops";
+import { MOCK_BRANDS, MOCK_PRODUCTS } from "@/src/mockData/shops/searchShops";
 import HorizontalBrands from "./HorizontalBrands";
 import HorizontalProducts from "./HorizontalProducts";
 
