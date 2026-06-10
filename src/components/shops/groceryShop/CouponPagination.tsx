@@ -2,10 +2,10 @@ import { Coupon } from '@/src/types';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming
 } from 'react-native-reanimated';
 
 // Custom Animated Dot Component for smooth transitions

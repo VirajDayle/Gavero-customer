@@ -2,6 +2,7 @@ import { SELECT_ADDRESS } from "@/src/constants/selectAddress";
 import { SHOP_CATEGORIES } from "@/src/mockData/shops/shopCategories";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import clsx from "clsx";
+import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
 import Animated, {
@@ -78,7 +79,19 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
   }));
 
   return (
-    <View className={clsx(className, "px-4 pt-3 pb-1")}>
+    // <LinearGradient
+    //   colors={[
+    //     "rgba(134, 239, 172, 0.9)",
+    //     "rgba(74, 222, 128, 0.8)",
+    //     "rgba(74, 222, 128, 0.5)",
+    //     "rgba(74, 222, 128, 0)",
+    //   ]}
+    //   locations={[0, 0.1, 0.2, 1]}
+    //   start={{ x: 0.5, y: 0 }}
+    //   end={{ x: 0.5, y: 1 }}
+    //   className="w-full"
+    // >
+    <View className={clsx(className, "px-4 pt-3 pb-1 ")}>
       {/* ── Collapsible top row (address + action icons) ── */}
       <Animated.View style={clipStyle}>
         <View
@@ -105,18 +118,38 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
 
           {/* Action icons — slide right on collapse */}
           <Animated.View
-            className="flex-row items-center gap-2"
+            className="flex-row items-center gap-0"
             style={actionsStyle}
           >
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons
-                name="notifications-outline"
-                size={22}
-                color="#111827"
-              />
+            <Pressable
+              className="relative h-12 w-12 items-center justify-center"
+              onPress={() => router.push("/(app)/(auth)/message-box")}
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                <Ionicons
+                  name="notifications-outline"
+                  size={22}
+                  color="#111827"
+                />
+              </View>
+              <View className="absolute top-1 right-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 border-2 border-white">
+                <Text className="text-[10px] font-bold text-white mt-0.5">
+                  4
+                </Text>
+              </View>
             </Pressable>
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons name="cart-outline" size={22} color="#111827" />
+            <Pressable
+              className="relative h-12 w-12 items-center justify-center"
+              onPress={() => router.push("/(app)/(auth)/cart")}
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                <Ionicons name="cart-outline" size={22} color="#111827" />
+              </View>
+              <View className="absolute top-1 right-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 border-2 border-white">
+                <Text className="text-[10px] font-bold text-white mt-0.5">
+                  5
+                </Text>
+              </View>
             </Pressable>
           </Animated.View>
         </View>
@@ -148,6 +181,7 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
         <ShopCategories items={SHOP_CATEGORIES} />
       </View>
     </View>
+    // </LinearGradient>
   );
 };
 

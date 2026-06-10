@@ -1,5 +1,6 @@
 import type { Product } from "@/src/types/product";
 import { FlashList } from "@shopify/flash-list";
+import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import ProductCard from "./ProductCard";
@@ -47,6 +48,7 @@ export const TopDeal = React.memo(
               onAdd={() => onAddProduct(item)}
               onIncrement={() => onIncrementProduct(item)}
               onDecrement={() => onDecrementProduct(item)}
+              onPress={(id)=> router.push("/(app)/(auth)/big-grocery")}
             />
           </View>
         );

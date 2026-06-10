@@ -38,6 +38,10 @@ export interface AddCartProps {
   onRemove?: () => void;
   /** Disable all interactions. */
   disabled?: boolean;
+  /** Custom tailwind background color class. Defaults to "bg-green-900" */
+  color?: string;
+  /** Whether to open the stepper horizontally. Defaults to false (vertical). */
+  horizontal?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -48,10 +52,12 @@ const AddCart = React.forwardRef<AddCartHandle, AddCartProps>(
       initialQuantity = 0,
       min = 0,
       max,
-      autoCloseDelay = 2000,
+      autoCloseDelay = 1000,
       onQuantityChange,
       onRemove,
       disabled = false,
+      color,
+      horizontal = false,
     },
     ref,
   ) => {
@@ -165,7 +171,10 @@ const AddCart = React.forwardRef<AddCartHandle, AddCartProps>(
     // ── Render ────────────────────────────────────────────────────────────
     return (
       <View
-        className="justify-center items-center h-[72px]"
+        className={clsx(
+          "justify-center items-center",
+          horizontal ? "w-[75px]" : "h-[72px]"
+        )}
         accessibilityRole="adjustable"
         pointerEvents="box-none"
       >
@@ -189,7 +198,8 @@ const AddCart = React.forwardRef<AddCartHandle, AddCartProps>(
               }
               className={clsx(
                 "rounded-full justify-center items-center border-[0.5] border-gray-300",
-                hasItems ? "bg-green-900 px-1 py-1" : "bg-white p-1.5",
+                hasItems ? "px-1 py-1" : "bg-white p-1.5",
+                hasItems && (color || "bg-green-900"),
                 disabled && "opacity-40",
               )}
               style={({ pressed }) => ({
@@ -219,7 +229,11 @@ const AddCart = React.forwardRef<AddCartHandle, AddCartProps>(
             entering={FadeIn.duration(150)}
             exiting={FadeOut.duration(100)}
             layout={LinearTransition.duration(150)}
-            className="flex-col items-center justify-between bg-green-900 rounded-full px-1 py-1 min-h-[75px]"
+            className={clsx(
+              "items-center justify-between rounded-full px-1 py-1",
+              horizontal ? "flex-row min-w-[75px]" : "flex-col min-h-[75px]",
+              color || "bg-green-900"
+            )}
             style={{
               elevation: 4,
               shadowColor: "#000",

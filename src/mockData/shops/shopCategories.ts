@@ -11,13 +11,15 @@ export const SHOP_CATEGORIES: ShopCategoryItem[] = [
     icon: require("@/src/assets/images/shopCategeory/grocery.png"),
     title: "Grocery",
     color: "#B7ECCD",
+    textColor: "#111827",
   },
   {
     id: "3",
     iconActive: require("@/src/assets/images/shopCategeory/restaurant.png"),
     icon: require("@/src/assets/images/shopCategeory/grocery.png"),
     title: "Restaurant",
-    color: "#121212",
+    color: "#000000", // Tomato Red - perfect for food cravings
+    textColor: "#FFFFFF",
   },
   {
     id: "4",

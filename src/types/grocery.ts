@@ -31,6 +31,11 @@ export interface ShopTypeData {
 
 // ─── GroceryShop Sections ────────────────────────────────────────────────────
 
+export interface Header {
+  id: string;
+  type: "header";
+}
+
 export type CouponSection = {
   id: string;
   type: "couponSection";
@@ -88,7 +93,17 @@ export type FlashSaleSection = {
   endTime: string; // ISO string or timestamp
 };
 
-export type SectionItem =
+export type StickySearchBarSection = {
+  id: string;
+  type: "stickySearchBar";
+};
+
+export type HeaderSpacerSection = {
+  id: string;
+  type: "headerSpacer";
+};
+
+export type GrocerySectionItem =
   | CouponSection
   | CategorySection
   | TopDeal
@@ -96,6 +111,6 @@ export type SectionItem =
   | GoToSection
   | BundleSection
   | CustomRowSection
-  | FlashSaleSection;
-
-export type Sections = SectionItem[];
+  | FlashSaleSection
+  | StickySearchBarSection
+  | HeaderSpacerSection;

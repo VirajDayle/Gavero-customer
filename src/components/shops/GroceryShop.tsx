@@ -1,6 +1,8 @@
+import { ShopType } from "@/src/types";
 import type { Coupon } from "@/src/types/coupon";
 import type { SectionItem, Sections } from "@/src/types/grocery";
 import type { Product } from "@/src/types/product";
+import { Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -11,11 +13,17 @@ import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
 import { Ticket } from "lucide-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Text, View } from "react-native";
-import {
+import { Pressable, Text, View } from "react-native";
+import Animated, {
   createAnimatedComponent,
+  SharedValue,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
+import SearchBar from "../ui/SearchBar";
+import ShopTopSections from "../ui/ShopTopSections";
 import Bundles from "./groceryShop/Bundles";
 import CouponCode from "./groceryShop/CouponCode";
 import { CouponExpandableRow } from "./groceryShop/CouponExpandableRow";
@@ -28,19 +36,92 @@ import TopDeal from "./groceryShop/TopDeal";
 
 const AnimatedFlashList = createAnimatedComponent(FlashList);
 
+const HeaderSpacerItem = ({
+  style,
+  currentShop,
+  changeShop,
+  onLayout,
+}: {
+  style: any;
+  currentShop: ShopType;
+  changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
+  onLayout?: (e: any) => void;
+}) => (
+  <View onLayout={onLayout}>
+    <Animated.View style={style} />
+    <View className="bg-[#FAFAF7]">
+      <ShopTopSections currentShop={currentShop} changeShop={changeShop} />
+    </View>
+  </View>
+);
+
+const StickySearchBarItem = ({
+  scrollY,
+  scrollThresholdSv,
+}: {
+  scrollY: SharedValue<number>;
+  scrollThresholdSv: SharedValue<number>;
+}) => {
+  const animatedBackButtonStyle = useAnimatedStyle(() => {
+    // Add a small buffer (e.g., 20px) to make sure it only shows when fully sticky
+    const threshold =
+      scrollThresholdSv.value > 0 ? scrollThresholdSv.value - 20 : 200;
+    const isSticky = scrollY.value >= threshold;
+    return {
+      opacity: withTiming(isSticky ? 1 : 0, { duration: 180 }),
+      width: withTiming(isSticky ? 40 : 0, { duration: 180 }),
+      marginRight: withTiming(isSticky ? 3 : 0, { duration: 180 }),
+      marginTop: withTiming(isSticky ? 8 : 0, { duration: 180 }),
+    };
+  });
+
+  return (
+    <View style={{ backgroundColor: "#B7ECCD" }}>
+      <View className="px-3 flex-row items-center justify-between h-14 mb-2">
+        <Animated.View
+          style={[animatedBackButtonStyle, { overflow: "hidden" }]}
+        >
+          <Pressable
+            className="w-9 h-9 items-center justify-center bg-white rounded-full active:opacity-60"
+            hitSlop={8}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={22} color="#111827" />
+          </Pressable>
+        </Animated.View>
+        <View className="flex-1 justify-center mt-2">
+          <SearchBar className="w-full" placeholderText="search from grocery" />
+        </View>
+      </View>
+      {/* ── Animated Bottom Border ── */}
+      <View className="absolute -bottom-px left-0 right-0 h-px bg-gray-200" />
+    </View>
+  );
+};
+
 interface GroceryShopProps {
   sections: Sections;
-  headerHeight: number;
   onScroll: ReturnType<typeof useAnimatedScrollHandler>;
-  activeColor?: string;
+  headerHeightSv: SharedValue<number>;
+  currentShop: ShopType;
+  changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
+  scrollY: SharedValue<number>;
 }
 
 const GroceryShop = ({
   sections,
-  headerHeight,
   onScroll,
-  activeColor,
+  headerHeightSv,
+  currentShop,
+  changeShop,
+  scrollY,
 }: GroceryShopProps) => {
+  const scrollThresholdSv = useSharedValue(200);
+
+  const headerSpacerStyle = useAnimatedStyle(() => ({
+    height: headerHeightSv.value,
+  }));
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [sheetCoupons, setSheetCoupons] = useState<Coupon[]>([]);
   const [expandedCouponId, setExpandedCouponId] = useState<
@@ -108,36 +189,60 @@ const GroceryShop = ({
     router.push({ pathname: "/shop-expand", params: { categoryId } });
   }, []);
 
+  const extendedData = useMemo(
+    () => [
+      { id: "header-spacer", type: "headerSpacer" } as SectionItem,
+      { id: "sticky-search-bar", type: "stickySearchBar" } as SectionItem,
+      ...sections,
+    ],
+    [sections],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: SectionItem }) => {
-      if (item.type === "internalCategory") {
+      if (item.type === "headerSpacer") {
         return (
+          <HeaderSpacerItem
+            style={headerSpacerStyle}
+            currentShop={currentShop}
+            changeShop={changeShop}
+            onLayout={(e) => {
+              scrollThresholdSv.value = e.nativeEvent.layout.height;
+            }}
+          />
+        );
+      }
+
+      let content = null;
+      if (item.type === "stickySearchBar") {
+        content = (
+          <StickySearchBarItem
+            scrollY={scrollY}
+            scrollThresholdSv={scrollThresholdSv}
+          />
+        );
+      } else if (item.type === "internalCategory") {
+        content = (
           <View>
             <InternalCategeory categories={item.data} />
           </View>
         );
-      }
-
-      if (item.type === "couponSection") {
-        return (
+      } else if (item.type === "couponSection") {
+        content = (
           <View>
             <CouponCode coupons={item.data} onOpenSheet={handleOpenSheet} />
           </View>
         );
-      }
-
-      if (item.type === "quickGo") {
-        return (
+      } else if (item.type === "quickGo") {
+        content = (
           <QuickGo
             title={item.title}
             categories={item.data}
             onCategoryPress={handleQuickGoPress}
           />
         );
-      }
-
-      if (item.type === "goToSection") {
-        return (
+      } else if (item.type === "goToSection") {
+        content = (
           <GoToSection
             title={item.title}
             products={item.data}
@@ -148,10 +253,8 @@ const GroceryShop = ({
             onSeeAllPress={() => handleSeeAllPress(item.id)}
           />
         );
-      }
-
-      if (item.type === "bundles") {
-        return (
+      } else if (item.type === "bundles") {
+        content = (
           <Bundles
             title={item.title}
             products={item.data}
@@ -162,10 +265,8 @@ const GroceryShop = ({
             onSeeAllPress={() => handleSeeAllPress(item.id)}
           />
         );
-      }
-
-      if (item.type === "topDeal") {
-        return (
+      } else if (item.type === "topDeal") {
+        content = (
           <View>
             <TopDeal
               title={item.title}
@@ -178,10 +279,8 @@ const GroceryShop = ({
             />
           </View>
         );
-      }
-
-      if (item.type === "flashSale") {
-        return (
+      } else if (item.type === "flashSale") {
+        content = (
           <View>
             <FlashSale
               title={item.title}
@@ -194,10 +293,8 @@ const GroceryShop = ({
             />
           </View>
         );
-      }
-
-      if (item.type === "customRow") {
-        return (
+      } else if (item.type === "customRow") {
+        content = (
           <View>
             <CustomRow
               title={item.title}
@@ -212,7 +309,9 @@ const GroceryShop = ({
         );
       }
 
-      return null;
+      if (!content) return null;
+
+      return <View className="bg-[#FAFAF7]">{content}</View>;
     },
     [
       handleOpenSheet,
@@ -221,30 +320,22 @@ const GroceryShop = ({
       handleTopDealIncrement,
       handleTopDealDecrement,
       handleSeeAllPress,
+      headerSpacerStyle,
+      currentShop,
+      changeShop,
+      scrollY,
+      scrollThresholdSv,
     ],
   );
 
   return (
-    <View className="flex-1 bg-[#FAFAF7]">
+    <View className="flex-1 z-10">
       <AnimatedFlashList
-        data={sections}
+        data={extendedData}
         keyExtractor={(item) => (item as SectionItem).id}
         renderItem={renderItem as any}
         getItemType={(item) => (item as SectionItem).type}
-        ListHeaderComponent={
-          <View style={{ height: headerHeight, justifyContent: "flex-end" }}>
-            <View
-              style={{
-                height: 100,
-                backgroundColor: activeColor ?? "#B7ECCD",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-              }}
-            />
-          </View>
-        }
+        stickyHeaderIndices={[1]}
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}

@@ -3,7 +3,7 @@ import SearchBar from "@/src/components/ui/SearchBar";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { LayoutChangeEvent, Pressable, View } from "react-native";
+import { LayoutChangeEvent, Pressable, View, Text } from "react-native";
 import Animated, {
   interpolate,
   SharedValue,
@@ -12,9 +12,10 @@ import Animated, {
 
 interface Props {
   progress: SharedValue<number>;
+  title: string;
 }
 
-const SearchShopsHeader = ({ progress }: Props) => {
+const SearchShopsHeader = ({ progress, title }: Props) => {
   const hasMeasured = useRef(false);
   const [measuredHeight, setMeasuredHeight] = useState(0);
 
@@ -71,7 +72,10 @@ const SearchShopsHeader = ({ progress }: Props) => {
   return (
     <View className="px-4 pb-4 pt-3 relative">
       {/* Absolute Back Button, always visible at top-left */}
-      <Animated.View style={backButtonAnimation} className="absolute z-10 left-4">
+      <Animated.View
+        style={backButtonAnimation}
+        className="absolute z-10 left-4"
+      >
         <Pressable
           className="w-9 h-9 rounded-full bg-[#f5f5f5] items-center justify-center active:opacity-60"
           hitSlop={8}
@@ -88,22 +92,50 @@ const SearchShopsHeader = ({ progress }: Props) => {
           className="flex-row items-center justify-between ml-12"
         >
           <Animated.View style={leftStyleAnimation}>
-            <ClosedCard className="" />
+            <ClosedCard
+              label="Fastest"
+              finalText={title}
+              iconName="flash"
+              iconColor="#3730A3"
+              iconSize={16}
+              textClassName="text-[18px] font-bold text-indigo-900"
+              finalTextClassName="text-[18px] font-bold"
+            />
           </Animated.View>
 
           <Animated.View
-            className="flex-row items-center gap-2"
+            className="flex-row items-center gap-0"
             style={rightStyleAnimation}
           >
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons
-                name="notifications-outline"
-                size={22}
-                color="#111827"
-              />
+            <Pressable
+              className="relative h-12 w-12 items-center justify-center"
+              onPress={() => router.push("/(app)/(auth)/message-box")}
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                <Ionicons
+                  name="notifications-outline"
+                  size={22}
+                  color="#111827"
+                />
+              </View>
+              <View className="absolute top-1 right-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 border-2 border-white">
+                <Text className="text-[10px] font-bold text-white mt-0.5">
+                  4
+                </Text>
+              </View>
             </Pressable>
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons name="cart-outline" size={22} color="#111827" />
+            <Pressable
+              className="relative h-12 w-12 items-center justify-center"
+              onPress={() => router.push("/(app)/(auth)/cart")}
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                <Ionicons name="cart-outline" size={22} color="#111827" />
+              </View>
+              <View className="absolute top-1 right-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 border-2 border-white">
+                <Text className="text-[10px] font-bold text-white mt-0.5">
+                  5
+                </Text>
+              </View>
             </Pressable>
           </Animated.View>
         </View>

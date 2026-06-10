@@ -1,9 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import clsx from "clsx";
 import React from "react";
-import { Image, ImageSourcePropType, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 
-interface ShopCardProps {
+export interface ShopCardProps {
   name: string;
   tagline?: string;
   rating: number;
@@ -31,6 +37,7 @@ const ShopCard: React.FC<ShopCardProps> = ({
   couponCode,
   onSavePress,
   onPress,
+  rating,
 }) => {
   return (
     <Pressable
@@ -39,19 +46,34 @@ const ShopCard: React.FC<ShopCardProps> = ({
       className={clsx(
         "flex-row items-start gap-3 px-4 py-3",
         // isClosed && "opacity-55",
-        "active:bg-gray-100"
+        "active:bg-gray-100",
       )}
     >
       {/* Left — shop image */}
       <View className="mt-0.5 h-14 w-14 flex-shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-50">
-        <Image source={imageSource} className="h-full w-full" resizeMode="cover" />
+        <Image
+          source={imageSource}
+          className="h-full w-full"
+          resizeMode="cover"
+        />
       </View>
 
       {/* Center — info */}
       <View className="flex-1 gap-1.5 min-w-0">
-        <Text className="text-[14.5px] font-bold text-gray-900" numberOfLines={1}>
-          {name}
-        </Text>
+        <View className="flex-row items-center justify-between">
+          <Text
+            className="flex-1 text-[14.5px] font-bold text-gray-900 pr-2"
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+          {rating ? (
+            <View className="flex-row items-center bg-green-700 px-1.5 py-0.5 rounded gap-0.5 min-w-[36px] justify-center">
+              <Text className="text-[10px] font-bold text-white">{Number(rating).toFixed(1)}</Text>
+              <Ionicons name="star" size={9} color="#fcd34d" />
+            </View>
+          ) : null}
+        </View>
         {/* 
         {tagline && (
           <Text className="text-xs text-gray-400" numberOfLines={1}>
@@ -62,7 +84,9 @@ const ShopCard: React.FC<ShopCardProps> = ({
         <View className="flex-row items-center gap-1.5">
           <View className="flex-row items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5">
             <Ionicons name="time-outline" size={13} color="#6B7280" />
-            <Text className="text-xs font-medium text-gray-600">{deliveryTime}</Text>
+            <Text className="text-xs font-medium text-gray-600">
+              {deliveryTime}
+            </Text>
           </View>
           <View className="h-1 w-1 rounded-full bg-gray-300" />
           <Text className="text-xs text-gray-500">{distance}</Text>
@@ -76,18 +100,6 @@ const ShopCard: React.FC<ShopCardProps> = ({
             </Text>
           </View>
         )} */}
-      </View>
-
-      {/* Right — status badge */}
-      <View className="items-end pt-0.5">
-        {isFastest && !isClosed && (
-          <Pressable onPress={onSavePress} hitSlop={10}>
-            <View className="h-7 w-7 items-center justify-center rounded-full bg-indigo-50">
-              <Ionicons name="flash" size={16} color="#3730A3" />
-            </View>
-          </Pressable>
-        )}
-
       </View>
     </Pressable>
   );

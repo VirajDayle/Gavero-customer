@@ -14,7 +14,6 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from "react-native-reanimated";
-import SearchBar from "./SearchBar";
 
 interface CategoryChipProps {
   item: ShopCategoryItem;
@@ -27,11 +26,9 @@ import { SHOP_CATEGORIES } from "@/src/mockData/shops/shopCategories";
 const CategoryChip = ({ item, isActive, onPress }: CategoryChipProps) => {
   return (
     <Pressable
-      className={clsx(
-        "items-center justify-end w-18 h-17 rounded-t-2xl",
-        isActive
-          ? `border-t-[0.75] border-r-[0.75] border-l-[0.75] border-[#C0C0C0]`
-          : "bg-transparent",
+        className= {clsx(
+        "items-center justify-end w-18 rounded-t-2xl h-18 pb-1.5", // ← justify-end
+        isActive ? `border-t-[0.75] border-r-[0.75] border-l-[0.75] border-[#C0C0C0]` : ""
       )}
       style={{ backgroundColor: isActive ? item.color : "transparent" }}
       onPress={onPress} // ← no router.push here anymore
@@ -41,7 +38,7 @@ const CategoryChip = ({ item, isActive, onPress }: CategoryChipProps) => {
           <Image
             source={item.iconActive}
             className={clsx(
-              isActive ? "h-11 w-11" : "h-9 w-9",
+              isActive ? "h-11 w-11" : "h-11 w-11",
               pressed && "opacity-90",
             )}
             resizeMode="contain"
@@ -50,13 +47,13 @@ const CategoryChip = ({ item, isActive, onPress }: CategoryChipProps) => {
             className={clsx(
               "text-[10px] text-center",
               isActive
-                ? "font-bold text-gray-900"
-                : "font-medium text-gray-500",
+                ? "font-medium text-gray-900"
+                : "font-medium text-gray-900",
             )}
             numberOfLines={1}
           >
             {item.title}
-          </Text>
+        </Text>
         </>
       )}
     </Pressable>
@@ -79,20 +76,25 @@ const ShopHeader = ({
   // Derive the active category item so we can read its color
   const activeItem = SHOP_CATEGORIES.find((c) => c.title === currentShop);
 
+  // Calculate header height in this
   const headerHeightSV = useSharedValue(0);
+  // If calculated then not calculate again
   const hasMeasured = useRef(false);
+  const CategeoryHeightSV = useSharedValue(0);
+  // If calculated then not calculate again
+  const hasCatgeory = useRef(false);
 
+  // height measure
   const onBackgroundLayout = useCallback((e: LayoutChangeEvent) => {
     if (hasMeasured.current) return;
     headerHeightSV.value = e.nativeEvent.layout.height;
     hasMeasured.current = true;
   }, []);
 
-  const linearGradientYSV = useSharedValue(0);
-
-  const onViewLayout = useCallback((e: LayoutChangeEvent) => {
-    if (linearGradientYSV.value !== 0) return;
-    linearGradientYSV.value = e.nativeEvent.layout.y;
+  const onHeaderHeight = useCallback((e: LayoutChangeEvent) => {
+    if (hasCatgeory.current) return;
+    CategeoryHeightSV.value = e.nativeEvent.layout.height;
+    hasCatgeory.current = true;
   }, []);
 
   // Single progress value (0 → 1) derived once on UI thread
@@ -110,11 +112,12 @@ const ShopHeader = ({
   // Layer 3 translates up based on scroll, clamped to not exceed the background height + upper list offset
   const layer3Style = useAnimatedStyle(() => {
     if (headerHeightSV.value === 0) return { transform: [{ translateY: 0 }] };
-    const maxTranslate = headerHeightSV.value + linearGradientYSV.value + 2;
+    const maxTranslate = headerHeightSV.value + CategeoryHeightSV.value + 12;
     return {
       transform: [{ translateY: -clamp(scrollY.value, 0, maxTranslate) }],
     };
   });
+
 
   // Shop name fades out slightly earlier than the background
   const textStyle = useAnimatedStyle(() => ({
@@ -122,9 +125,8 @@ const ShopHeader = ({
   }));
 
   const stickyProgress = useDerivedValue(() => {
-    const maxTranslate = headerHeightSV.value + linearGradientYSV.value + 2;
-    if (maxTranslate === 0) return 0;
-    return clamp(scrollY.value / maxTranslate, 0, 1);
+    if (headerHeightSV.value === 0) return 0;
+    return clamp(scrollY.value / headerHeightSV.value, 0, 1);
   });
 
   const backBtnStyle = useAnimatedStyle(() => {
@@ -183,6 +185,7 @@ const ShopHeader = ({
 
           {/* Logo + Name + Rating */}
           <View className="flex-row items-end justify-center overflow-hidden">
+
             {/* Center Logo */}
             <View className="items-center">
               <View className="h-20 w-20 rounded-full overflow-hidden border border-gray-100">
@@ -217,9 +220,10 @@ const ShopHeader = ({
                   style={{ marginLeft: 2 }}
                 />
               </View>
-              <Text className="mt-0.5 text-[8px] font-semibold text-center">
-                (108 Reviews)
-              </Text>
+                <Text className="mt-0.5 text-[8px] font-semibold text-center">
+                  (108 Reviews)
+                </Text>
+              <T
             </View>
           </View>
         </View>
@@ -227,10 +231,12 @@ const ShopHeader = ({
 
       {/* ── Layer 2/3: Everything below translates up ── */}
       <Animated.View
-        style={[{ zIndex: 10, backgroundColor: "#ffffff" }, layer3Style]}
+
+        style={[{ zIndex: 10 }, layer3Style]}
         pointerEvents="box-none"
+        onLayout={onHeaderHeight}
       >
-        <View className="-mb-0.5 mt-3 z-10">
+        <View className="mt-3 z-10 bg-white">
           <FlashList
             data={SHOP_CATEGORIES}
             horizontal
@@ -248,27 +254,6 @@ const ShopHeader = ({
                 onPress={() => onShopChange(item.title as ShopType)}
               />
             )}
-          />
-        </View>
-
-        <View
-          onLayout={onViewLayout}
-          className="border-t-[0.75] border-[#C0C0C0]"
-          style={{ backgroundColor: activeItem?.color ?? "#B7ECCD" }}
-        >
-          <View className="px-4">
-            <Animated.View style={searchBarStyle}>
-              <SearchBar
-                className="mt-3 mb-2"
-                placeholderText="search from store"
-              />
-            </Animated.View>
-          </View>
-
-          {/* ── Animated Bottom Border ── */}
-          <Animated.View
-            style={borderStyle}
-            className="absolute -bottom-px left-0 right-0 h-px bg-gray-200"
           />
         </View>
       </Animated.View>

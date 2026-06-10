@@ -1,11 +1,9 @@
-import type { Sections } from "@/src/types/grocery";
+import { GrocerySectionItem } from "@/src/types/grocery";
 import { MOCK_COUPONS } from "./coupon";
 import { GROCERY_CATEGORIES } from "./groceryCategories";
 import { SUPERMARKET_PRODUCTS } from "./supermarketProducts";
 
-
-export const SECTIONS: Sections = [
-
+export const GROCERY_SECTIONS: GrocerySectionItem[] = [
   {
     id: "0",
     type: "internalCategory",
@@ -89,5 +87,4 @@ export const SECTIONS: Sections = [
     title: "Breakfast Essentials",
     data: SUPERMARKET_PRODUCTS.slice(0, 10),
   },
-
 ];

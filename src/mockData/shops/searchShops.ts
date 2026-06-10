@@ -1,4 +1,4 @@
-import type { ShopItem, ProductItem, BrandItem } from "@/src/types/search";
+import type { BrandItem, ProductItem, ShopItem } from "@/src/types/search";
 
 export const ACTIVE_SHOPS: ShopItem[] = [
   {
@@ -238,5 +238,135 @@ export const MOCK_BRANDS: BrandItem[] = [
     id: "b5",
     name: "Britannia",
     imageSource: require("@/src/assets/images/balajimart.png"),
+  },
+];
+
+import { RestaurantItem } from "@/src/types/search";
+
+export const ACTIVE_RESTAURANTS: RestaurantItem[] = [
+  {
+    id: "r1",
+    name: "The Spicy Venue",
+    rating: 4.8,
+    distance: "1.2 km",
+    deliveryTime: "20-25 min",
+    tags: ["North Indian", "Biryani"],
+    isFastest: true,
+    couponCode: "SPICY20",
+    isSaved: true,
+    data: [
+      {
+        itemName: "Chicken Biryani",
+        price: 250,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: false,
+      },
+      {
+        itemName: "Mutton Kebab",
+        price: 350,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: false,
+      },
+    ],
+  },
+  {
+    id: "r2",
+    name: "Pizza Palace",
+    rating: 4.5,
+    distance: "2.5 km",
+    deliveryTime: "30-35 min",
+    tags: ["Italian", "Pizza"],
+    data: [
+      {
+        itemName: "Margherita Pizza",
+        price: 199,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+      {
+        itemName: "Pepperoni Pizza",
+        price: 299,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: false,
+      },
+    ],
+  },
+  {
+    id: "r3",
+    name: "Dragon Wok",
+    rating: 4.2,
+    distance: "3.1 km",
+    deliveryTime: "35-45 min",
+    tags: ["Chinese", "Asian"],
+    couponCode: "WELCOME50",
+    data: [
+      {
+        itemName: "Hakka Noodles",
+        price: 150,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+      {
+        itemName: "Manchurian",
+        price: 180,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+    ],
+  },
+  {
+    id: "r4",
+    name: "Green Valley Cafe",
+    rating: 4.9,
+    distance: "4.0 km",
+    deliveryTime: "40-55 min",
+    tags: ["Healthy", "Salads"],
+    data: [
+      {
+        itemName: "Quinoa Salad",
+        price: 220,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+      {
+        itemName: "Avocado Toast",
+        price: 190,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+    ],
+  },
+  {
+    id: "r5",
+    name: "Burger Joint",
+    rating: 4.4,
+    distance: "3.5 km",
+    deliveryTime: "40-55 min",
+    tags: ["Fast Food", "Snacks"],
+    isClosed: true,
+    data: [
+      {
+        itemName: "Cheese Burger",
+        price: 150,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+      {
+        itemName: "French Fries",
+        price: 90,
+        imageUrl:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        isVeg: true,
+      },
+    ],
   },
 ];

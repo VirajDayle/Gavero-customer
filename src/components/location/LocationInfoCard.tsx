@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native";
 interface LocationInfoCardProps {
   line1?: string | null;
   formattedAddress?: string | null;
-  onChangeAddress: () => void;
+  onChangeAddress?: () => void;
 }
 
 const LocationInfoCard: React.FC<LocationInfoCardProps> = ({

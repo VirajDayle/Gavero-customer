@@ -8,4 +8,6 @@ export type ShopCategoryItem = {
   iconActive: ImageSourcePropType;
   /** Optional accent color used for active chip background */
   color?: string;
+  /** Optional text color used for active chip text */
+  textColor?: string;
 };

@@ -1,62 +1,767 @@
-import type { SectionItem, Sections } from "@/src/types/grocery";
-import { FlashList } from "@shopify/flash-list";
-import React, { useCallback } from "react";
-import { View } from "react-native";
+import { ShopType } from "@/src/types";
+import type { Coupon } from "@/src/types/coupon";
+import { Ionicons } from "@expo/vector-icons";
 import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import { FlashList, ViewToken } from "@shopify/flash-list";
+import { BlurView } from "expo-blur";
+import { Ticket } from "lucide-react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { Pressable, Text, View } from "react-native";
+import Animated, {
   createAnimatedComponent,
+  SharedValue,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ShopTopSections from "../ui/ShopTopSections";
+import { CouponExpandableRow } from "./groceryShop/CouponExpandableRow";
+import BigFoodItem from "./restaurantShop/BigFoodItem";
+import ComboOfferDetails from "./restaurantShop/ComboOfferDetails";
+import ComboOffers from "./restaurantShop/ComboOffers";
+import FlatendSection from "./restaurantShop/FlatendSection";
+import ItemUnder from "./restaurantShop/ItemUnder";
+import { NestedSubSection } from "./restaurantShop/NestedSection";
+import RecommendedForYou from "./restaurantShop/RecommendedForYou";
+import RestaurantCouponCode from "./restaurantShop/RestaurantCouponCode";
+import RestaurantFilter, {
+  FilterType,
+} from "./restaurantShop/RestaurantFilter";
+import StickyHeader from "./restaurantShop/StickyHeader";
+import type {
+  Combo,
+  Item,
+  MenuSection,
+  SectionItem,
+} from "./restaurantShop/type";
 
-const AnimatedFlashList = createAnimatedComponent(FlashList);
+const MOCK_RESTAURANT_COUPONS: Coupon[] = [
+  {
+    id: "rest-1",
+    code: "GAVERO50",
+    description: "Get 50% off on your first gourmet meal",
+    category: "Restaurant",
+    terms: "Valid on orders above ₹299",
+    imageType: "food",
+  },
+  {
+    id: "rest-2",
+    code: "FREEDEL",
+    description: "Free delivery on orders above ₹499",
+    category: "Restaurant",
+    terms: "Valid on all restaurant orders",
+    imageType: "delivery",
+  },
+];
 
-interface RestaurantShopProps {
-  sections: Sections;
-  headerHeight: number;
+const AnimatedFlashList = createAnimatedComponent(
+  FlashList,
+) as unknown as React.FC<any>;
+
+const HeaderSpacerItem = ({
+  style,
+  currentShop,
+  changeShop,
+  onLayout,
+}: {
+  style: any;
+  currentShop: ShopType;
+  changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
+  onLayout?: (e: any) => void;
+}) => (
+  <View onLayout={onLayout}>
+    <Animated.View style={style} />
+    <View className="bg-[#FAFAF7]">
+      <ShopTopSections currentShop={currentShop} changeShop={changeShop} />
+    </View>
+  </View>
+);
+
+interface RestaurantShopProp {
+  sections: MenuSection[];
   onScroll: ReturnType<typeof useAnimatedScrollHandler>;
-  activeColor?: string;
+  headerHeightSv: SharedValue<number>;
+  currentShop: ShopType;
+  changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
+  scrollY: SharedValue<number>;
 }
 
 const RestaurantShop = ({
   sections,
-  headerHeight,
   onScroll,
-  activeColor,
-}: RestaurantShopProps) => {
-  const renderItem = useCallback(({ item }: { item: SectionItem }) => {
-    return (
-      <View className="p-4 items-center justify-center h-40 bg-white m-2 rounded-xl shadow-sm">
-        <Text className="text-lg font-bold text-gray-800">{item.title || item.type}</Text>
-      </View>
-    );
+  headerHeightSv,
+  currentShop,
+  changeShop,
+  scrollY,
+}: RestaurantShopProp) => {
+  const insets = useSafeAreaInsets();
+  const scrollThresholdSv = useSharedValue(200);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const flatlistRef = useRef<any>(null);
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const couponBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [sheetCoupons, setSheetCoupons] = useState<Coupon[]>([]);
+  const [expandedCouponId, setExpandedCouponId] = useState<
+    string | number | null
+  >(null);
+
+  const comboBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [selectedCombo, setSelectedCombo] = useState<Combo | null>(null);
+
+  const foodItemBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [selectedFoodItem, setSelectedFoodItem] = useState<Item | null>(null);
+
+  const [dietaryFilter, setDietaryFilter] = useState<FilterType>("ALL");
+
+  const snapPoints = useMemo(() => ["68%", "75%"], []);
+
+  const handleOpenMenu = useCallback(() => {
+    bottomSheetModalRef.current?.present();
   }, []);
 
-  return (
-    <View className="flex-1 bg-[#FAFAF7]">
-      <AnimatedFlashList
-        data={sections}
-        keyExtractor={(item) => (item as SectionItem).id}
-        renderItem={renderItem as any}
-        getItemType={(item) => (item as SectionItem).type}
-        ListHeaderComponent={
-          <View style={{ height: headerHeight, justifyContent: "flex-end" }}>
-            <View
-              style={{
-                height: 100,
-                backgroundColor: activeColor ?? "#FFD1D1",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
+  const handleOpenCombo = useCallback((combo: Combo) => {
+    setSelectedCombo(combo);
+    comboBottomSheetRef.current?.present();
+  }, []);
+
+  const handleOpenFoodItem = useCallback((item: Item) => {
+    setSelectedFoodItem(item);
+    foodItemBottomSheetRef.current?.present();
+  }, []);
+
+  const handleOpenCouponSheet = useCallback(
+    (coupons: Coupon[], preExpandId?: string | number) => {
+      setSheetCoupons(coupons);
+      if (preExpandId) {
+        setExpandedCouponId(preExpandId);
+      }
+      couponBottomSheetRef.current?.present();
+    },
+    [],
+  );
+
+  const toggleCouponExpand = useCallback((id: string | number) => {
+    setExpandedCouponId((prev) => (prev === id ? null : id));
+  }, []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.9} // Lower opacity looks better when paired with blur!
+      >
+        <BlurView
+          intensity={30} // Adjust blur strength (0 - 100)
+          tint="dark" // Options: 'light', 'dark', 'default'
+          style={{ flex: 1 }}
+        />
+      </BottomSheetBackdrop>
+    ),
+    [],
+  );
+
+  const viewabilityConfig = useRef({
+    viewAreaCoveragePercentThreshold: 10,
+  }).current;
+
+  const isUserScrolling = useRef(false);
+
+  const filteredSections = useMemo(() => {
+    if (dietaryFilter === "ALL") return sections;
+
+    return sections
+      .map((section) => {
+        if (section.type === "flat-section") {
+          return {
+            ...section,
+            data: section.data.filter((item) =>
+              dietaryFilter === "VEG"
+                ? item.dietaryType === "VEG" || item.dietaryType === "VEGAN"
+                : item.dietaryType === "NON_VEG",
+            ),
+          };
+        } else if (section.type === "nested-section") {
+          return {
+            ...section,
+            data: section.data
+              .map((sub) => ({
+                ...sub,
+                data: sub.data.filter((item) =>
+                  dietaryFilter === "VEG"
+                    ? item.dietaryType === "VEG" || item.dietaryType === "VEGAN"
+                    : item.dietaryType === "NON_VEG",
+                ),
+              }))
+              .filter((sub) => sub.data.length > 0),
+          };
+        }
+        return section;
+      })
+      .filter((section) => section.data.length > 0) as MenuSection[];
+  }, [sections, dietaryFilter]);
+
+  const priceThreshold = 200;
+  const itemsUnderPrice = useMemo(() => {
+    const items: Item[] = [];
+    filteredSections.forEach((sec) => {
+      if (sec.type === "flat-section") {
+        sec.data.forEach((item) => {
+          if (item.price <= priceThreshold) items.push(item);
+        });
+      } else if (sec.type === "nested-section") {
+        sec.data.forEach((sub) => {
+          sub.data.forEach((item) => {
+            if (item.price <= priceThreshold) items.push(item);
+          });
+        });
+      }
+    });
+    return items;
+  }, [filteredSections]);
+
+  const recommendedItems = useMemo(() => {
+    const items: Item[] = [];
+    let count = 0;
+
+    // We break early when we have 4 items
+    for (const sec of filteredSections) {
+      if (sec.type === "flat-section") {
+        for (const item of sec.data) {
+          if (count >= 4) break;
+          items.push(item);
+          count++;
+        }
+      } else if (sec.type === "nested-section") {
+        for (const sub of sec.data) {
+          if (count >= 4) break;
+          for (const item of sub.data) {
+            if (count >= 4) break;
+            items.push(item);
+            count++;
+          }
+        }
+      }
+      if (count >= 4) break;
+    }
+    return items;
+  }, [filteredSections]);
+
+  const comboOffersData = useMemo(() => {
+    // Gather all available items
+    const allItems: Item[] = [];
+    for (const sec of filteredSections) {
+      if (sec.type === "flat-section") {
+        allItems.push(...sec.data.filter((i) => i.isAvailable));
+      } else if (sec.type === "nested-section") {
+        for (const sub of sec.data) {
+          allItems.push(...sub.data.filter((i) => i.isAvailable));
+        }
+      }
+    }
+
+    const comboNames = [
+      "The Ultimate Feast",
+      "Family Party Bundle",
+      "Midnight Snack Pack",
+      "Chef's Special Combo",
+      "Weekend Saver Deal",
+      "The Classic Duo",
+      "Mega Bites Bundle",
+      "Premium Taste Pack",
+    ];
+
+    // Chunk them into groups of 3
+    const combos: Combo[] = [];
+    let comboCounter = 1;
+    for (let i = 0; i < allItems.length; i += 3) {
+      const chunk = allItems.slice(i, i + 3);
+      if (chunk.length > 1) {
+        // Only make a combo if there's at least 2 items
+        const originalPrice = chunk.reduce((sum, item) => sum + item.price, 0);
+        const discountedPrice = originalPrice * 0.85; // 15% discount
+        combos.push({
+          id: `combo-${comboCounter}`,
+          name: comboNames[(comboCounter - 1) % comboNames.length],
+          items: chunk,
+          originalPrice,
+          discountedPrice,
+        });
+        comboCounter++;
+      }
+    }
+    return combos;
+  }, [filteredSections]);
+
+  const { flatData, sectionIndices, subSectionIndices } = useMemo(() => {
+    const flat: any[] = [];
+    const sIndices: Record<number, number> = {};
+    const subIndices: Record<string, number> = {};
+
+    flat.push({ id: "header-spacer", type: "headerSpacer" });
+    flat.push({ id: "sticky-header", type: "stickyHeader" });
+    flat.push({ id: "restaurant-coupon", type: "restaurantCoupon" });
+    flat.push({ id: "restaurant-filter", type: "restaurantFilter" });
+
+    if (itemsUnderPrice.length > 0) {
+      flat.push({
+        id: "item-under",
+        type: "itemUnder",
+        items: itemsUnderPrice,
+        priceThreshold: priceThreshold,
+      });
+    }
+
+    if (recommendedItems.length > 0) {
+      flat.push({
+        id: "recommended-for-you",
+        type: "recommendedForYou",
+        items: recommendedItems,
+      });
+    }
+
+    if (comboOffersData.length > 0) {
+      flat.push({
+        id: "combo-offers",
+        type: "comboOffers",
+        combos: comboOffersData,
+      });
+    }
+
+    filteredSections.forEach((sec, sIdx) => {
+      sIndices[sIdx] = flat.length;
+      if (sec.type === "flat-section") {
+        flat.push({ ...sec, sectionIndex: sIdx });
+      } else if (sec.type === "nested-section") {
+        flat.push({ ...sec, type: "nested-header", sectionIndex: sIdx });
+        sec.data.forEach((sub) => {
+          subIndices[sub.id] = flat.length;
+          flat.push({ ...sub, type: "nested-sub-section", sectionIndex: sIdx });
+        });
+      }
+    });
+
+    return {
+      flatData: flat,
+      sectionIndices: sIndices,
+      subSectionIndices: subIndices,
+    };
+  }, [filteredSections, itemsUnderPrice, recommendedItems, comboOffersData]);
+
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (!isUserScrolling.current) return;
+
+      if (viewableItems.length > 0) {
+        const sectionItems = viewableItems.filter(
+          (v) =>
+            v.item.type === "flat-section" ||
+            v.item.type === "nested-header" ||
+            v.item.type === "nested-sub-section",
+        );
+
+        if (sectionItems.length > 0) {
+          // If multiple sections are visible, the first one is likely the tail of the
+          // previous section occupying the top offset area. We pick the second one.
+          const sectionItem = sectionItems[sectionItems.length > 1 ? 1 : 0];
+
+          if (sectionItem.item.sectionIndex != null) {
+            setActiveIndex(sectionItem.item.sectionIndex);
+          }
+        }
+      }
+    },
+  ).current;
+
+  const onCategoryPress = useCallback(
+    (index: number) => {
+      isUserScrolling.current = false;
+
+      setActiveIndex(index);
+      const targetIndex = sectionIndices[index];
+
+      if (targetIndex != null) {
+        flatlistRef.current?.scrollToIndex({
+          index: targetIndex,
+          animated: true,
+          viewPosition: 0,
+          viewOffset: -100, // Increased to keep item below sticky header + padding
+        });
+      }
+    },
+    [sectionIndices],
+  );
+
+  const handleMenuCategoryPress = useCallback(
+    (index: number) => {
+      onCategoryPress(index);
+      bottomSheetModalRef.current?.dismiss();
+    },
+    [onCategoryPress],
+  );
+
+  const handleMenuSubCategoryPress = useCallback(
+    (subId: string, parentIndex: number) => {
+      isUserScrolling.current = false;
+      setActiveIndex(parentIndex);
+      const targetIndex = subSectionIndices[subId];
+
+      if (targetIndex != null) {
+        flatlistRef.current?.scrollToIndex({
+          index: targetIndex,
+          animated: true,
+          viewPosition: 0,
+          viewOffset: -140, // Increased offset so subsection titles clear the sticky header curve
+        });
+      }
+      bottomSheetModalRef.current?.dismiss();
+    },
+    [subSectionIndices],
+  );
+
+  const headerSpacerStyle = useAnimatedStyle(() => ({
+    height: headerHeightSv.value,
+  }));
+
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => {
+      if (item.type === "headerSpacer") {
+        return (
+          <View>
+            <HeaderSpacerItem
+              style={headerSpacerStyle}
+              currentShop={currentShop}
+              changeShop={changeShop}
+              onLayout={(e) => {
+                scrollThresholdSv.value = e.nativeEvent.layout.height;
               }}
             />
           </View>
-        }
+        );
+      }
+
+      let content = null;
+      if (item.type === "stickyHeader") {
+        return (
+          <View className="mb-6 z-10">
+            <StickyHeader
+              scrollY={scrollY}
+              scrollThresholdSv={scrollThresholdSv}
+              activeIndex={activeIndex}
+              menuSections={filteredSections}
+              onCategoryPress={onCategoryPress}
+            />
+          </View>
+        );
+      } else if (item.type === "restaurantFilter") {
+        content = (
+          <View className="mb-2">
+            <RestaurantFilter
+              currentFilter={dietaryFilter}
+              onFilterChange={setDietaryFilter}
+            />
+          </View>
+        );
+      } else if (item.type === "itemUnder") {
+        content = (
+          <View className="mb-4 bg-[#fefce8]">
+            <ItemUnder
+              items={item.items}
+              priceThreshold={item.priceThreshold}
+              onItemPress={handleOpenFoodItem}
+            />
+          </View>
+        );
+      } else if (item.type === "recommendedForYou") {
+        content = (
+          <View className="mb-2">
+            <RecommendedForYou
+              items={item.items}
+              onItemPress={handleOpenFoodItem}
+            />
+          </View>
+        );
+      } else if (item.type === "comboOffers") {
+        content = (
+          <View className="mb-2">
+            <ComboOffers combos={item.combos} onOpenCombo={handleOpenCombo} />
+          </View>
+        );
+      } else if (item.type === "flat-section") {
+        content = (
+          <View className="mt-3">
+            <FlatendSection item={item} onItemPress={handleOpenFoodItem} />
+          </View>
+        );
+      } else if (item.type === "nested-header") {
+        content = (
+          <View className="mt-3">
+            <View className="flex-row justify-between items-center bg-white pt-2.5">
+              <Text className="text-lg font-medium ml-3">{item.name}</Text>
+            </View>
+          </View>
+        );
+      } else if (item.type === "restaurantCoupon") {
+        content = (
+          <View>
+            <RestaurantCouponCode
+              coupons={MOCK_RESTAURANT_COUPONS}
+              onOpenSheet={handleOpenCouponSheet}
+            />
+          </View>
+        );
+      } else if (item.type === "nested-sub-section") {
+        content = (
+          <View>
+            <NestedSubSection subItem={item} onItemPress={handleOpenFoodItem} />
+          </View>
+        );
+      }
+
+      if (!content) return null;
+
+      return <View className="bg-white">{content}</View>;
+    },
+    [
+      headerSpacerStyle,
+      currentShop,
+      changeShop,
+      scrollY,
+      scrollThresholdSv,
+      activeIndex,
+      onCategoryPress,
+      filteredSections,
+      dietaryFilter,
+      handleOpenFoodItem,
+    ],
+  );
+  // ← render arrow direction from this subId: sub.id // ← needed for toggle handler
+  return (
+    <View className="flex-1 z-10">
+      <AnimatedFlashList
+        ref={flatlistRef}
+        data={flatData}
+        keyExtractor={(item) => (item as SectionItem).id}
+        renderItem={renderItem as any}
+        getItemType={(item) => (item as SectionItem).type}
+        stickyHeaderIndices={[1]}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
+        onScrollBeginDrag={() => {
+          isUserScrolling.current = true;
+        }}
         scrollEventThrottle={16}
         estimatedItemSize={400}
+        extraData={activeIndex}
       />
+
+      {/* Floating Menu Button */}
+      <View
+        className="absolute bottom-6 left-0 right-0 items-center justify-center"
+        pointerEvents="box-none"
+      >
+        <Pressable
+          onPress={handleOpenMenu}
+          className="flex-row items-center justify-center bg-black px-4 py-2.5 rounded-full shadow-lg active:opacity-80"
+        >
+          <Ionicons name="restaurant" size={15} color="white" />
+          <Text className="text-white font-bold text-[13px] ml-1.5 tracking-wide uppercase">
+            Menu
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* Bottom Sheet Menu */}
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 48 }}
+        topInset={insets.top}
+        bottomInset={insets.bottom}
+      >
+        <View className="flex-1 px-4 pt-2">
+          <View className="flex-row items-center justify-between mb-5 pb-3 border-b border-gray-100">
+            <Text className="text-xl font-bold text-gray-900">Menu</Text>
+            <Pressable onPress={() => bottomSheetModalRef.current?.dismiss()}>
+              <Ionicons name="close" size={24} color="#374151" />
+            </Pressable>
+          </View>
+          <BottomSheetScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 100 }}
+          >
+            {filteredSections.map((section, index) => {
+              if (section.type === "flat-section") {
+                return (
+                  <Pressable
+                    key={section.id}
+                    onPress={() => handleMenuCategoryPress(index)}
+                    className={`flex-row justify-between items-center py-4 border-b border-gray-100 ${
+                      index === activeIndex ? "bg-gray-50" : ""
+                    }`}
+                  >
+                    <Text
+                      className={`text-base ${
+                        index === activeIndex
+                          ? "font-bold text-black"
+                          : "font-medium text-gray-700"
+                      }`}
+                    >
+                      {section.name}
+                    </Text>
+                    <Text className="text-sm font-semibold text-gray-500">
+                      {section.data?.length || 0}
+                    </Text>
+                  </Pressable>
+                );
+              } else if (section.type === "nested-section") {
+                const totalItems = section.data.reduce(
+                  (sum, sub) => sum + (sub.data?.length || 0),
+                  0,
+                );
+                return (
+                  <View
+                    key={section.id}
+                    className={`border-b border-gray-100 py-4 ${
+                      index === activeIndex ? "bg-gray-50" : ""
+                    }`}
+                  >
+                    <Pressable
+                      onPress={() => handleMenuCategoryPress(index)}
+                      className="flex-row justify-between items-center mb-1"
+                    >
+                      <Text
+                        className={`text-base ${
+                          index === activeIndex
+                            ? "font-bold text-black"
+                            : "font-medium text-gray-700"
+                        }`}
+                      >
+                        {section.name}
+                      </Text>
+                      <Text className="text-sm font-semibold text-gray-500">
+                        {totalItems}
+                      </Text>
+                    </Pressable>
+                    <View className="ml-4 space-y-1.5 mt-2">
+                      {section.data.map((subItem) => (
+                        <Pressable
+                          key={subItem.id}
+                          onPress={() =>
+                            handleMenuSubCategoryPress(subItem.id, index)
+                          }
+                          className="flex-row justify-between items-center py-1"
+                        >
+                          <Text className="text-[15px] font-medium text-gray-500">
+                            {subItem.name}
+                          </Text>
+                          <Text className="text-xs font-medium text-gray-400">
+                            {subItem.data?.length || 0}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </View>
+                );
+              }
+              return null;
+            })}
+          </BottomSheetScrollView>
+        </View>
+      </BottomSheetModal>
+      {/* Coupon Bottom Sheet */}
+      <BottomSheetModal
+        ref={couponBottomSheetRef}
+        index={0}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 48 }}
+        topInset={insets.top}
+        bottomInset={insets.bottom}
+      >
+        <View className="flex-1 px-4 pt-2">
+          {/* Header */}
+          <View className="flex-row items-center space-x-2.5 mb-5 pb-3 border-b border-gray-100">
+            <View className="p-2 bg-orange-50 rounded-xl">
+              <Ticket size={22} color="#ea580c" />
+            </View>
+            <View className="ml-2">
+              <Text className="text-lg font-bold text-gray-900">
+                Available Coupons
+              </Text>
+              <Text className="text-xs text-gray-500">
+                Tap on any coupon voucher to view constraints
+              </Text>
+            </View>
+          </View>
+
+          <BottomSheetScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 80 }}
+          >
+            {sheetCoupons.map((coupon) => {
+              const couponId = coupon.id || coupon.code;
+              return (
+                <CouponExpandableRow
+                  key={couponId}
+                  coupon={coupon}
+                  isExpanded={expandedCouponId === couponId}
+                  onToggle={() => toggleCouponExpand(couponId)}
+                />
+              );
+            })}
+          </BottomSheetScrollView>
+        </View>
+      </BottomSheetModal>
+
+      {/* Combo Details Bottom Sheet */}
+      <BottomSheetModal
+        ref={comboBottomSheetRef}
+        index={1}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        handleIndicatorStyle={{ backgroundColor: "#d1d5db", width: 48 }}
+        topInset={insets.top}
+        bottomInset={insets.bottom}
+      >
+        {selectedCombo && (
+          <ComboOfferDetails
+            combo={selectedCombo}
+            onClose={() => comboBottomSheetRef.current?.dismiss()}
+          />
+        )}
+      </BottomSheetModal>
+
+      {/* Food Item Bottom Sheet */}
+      <BottomSheetModal
+        ref={foodItemBottomSheetRef}
+        index={1}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        handleComponent={null}
+        topInset={insets.top}
+        bottomInset={insets.bottom}
+        backgroundStyle={{ backgroundColor: "transparent" }}
+      >
+        {selectedFoodItem && (
+          <BigFoodItem
+            onClose={() => foodItemBottomSheetRef.current?.dismiss()}
+          />
+        )}
+      </BottomSheetModal>
     </View>
   );
 };

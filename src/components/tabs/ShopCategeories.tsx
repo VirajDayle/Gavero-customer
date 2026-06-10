@@ -30,7 +30,12 @@ const CategoryChip = ({ item }: CategoryChipProps) => {
   return (
     <Pressable
       className="items-center"
-      onPress={() => router.push("/(app)/(public)/search-shops")}
+      onPress={() =>
+        router.push({
+          pathname: "/(app)/(public)/search-shops",
+          params: { shopType: item.title },
+        })
+      }
     >
       {({ pressed }) => (
         <>
@@ -41,7 +46,7 @@ const CategoryChip = ({ item }: CategoryChipProps) => {
           />
 
           <Text
-            className="text-label text-xs mt-1 text-center"
+            className="text-label text-xs mt-1 text-center font-medium"
             numberOfLines={1}
           >
             {item.title}

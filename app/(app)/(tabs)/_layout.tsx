@@ -55,19 +55,6 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="nearby"
-        options={{
-          title: "NearBy",
-          headerShown: false,
-          tabBarIcon: ({ focused }) =>
-            TabIcon({
-              focused,
-              activeIcon: TAB_ICONS.nearby.active,
-              deactiveIcon: TAB_ICONS.nearby.deactive,
-            }),
-        }}
-      />
-      <Tabs.Screen
         name="categories"
         options={{
           title: "Categeories",

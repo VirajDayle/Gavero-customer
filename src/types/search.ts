@@ -14,6 +14,28 @@ export type ShopItem = {
   isClosed?: boolean;
 };
 
+export type RestaurantCardData = {
+  itemName: string;
+  price: number;
+  imageUrl?: any;
+  isVeg: boolean;
+};
+
+export type RestaurantItem = {
+  id: string;
+  name: string;
+  deliveryTime: string;
+  rating: number;
+  tags: string[];
+  data: RestaurantCardData[];
+  distance: string;
+  isSaved?: boolean;
+  isFastest?: boolean;
+  couponCode?: string;
+  isClosed?: boolean;
+};
+
+
 export type HeaderItem = {
   type: "header";
   title: string;
@@ -50,4 +72,5 @@ export type SearchListItem =
   | ShopItem
   | HeaderItem
   | HorizontalProducts
-  | HorizontalBrands;
+  | HorizontalBrands
+  | RestaurantItem;
