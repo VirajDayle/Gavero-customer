@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
 import {
+  Alert,
   Image,
   ImageSourcePropType,
   Pressable,
@@ -58,7 +59,25 @@ const CartCard = ({ name, logo, data = [] }: CartCardProps) => {
             {name}
           </Text>
         </View>
-        <Pressable className="p-1 active:opacity-60">
+        <Pressable
+          className="p-1 active:opacity-60"
+          onPress={() => {
+            Alert.alert(
+              "Delete Cart",
+              "Do you really want to delete this cart?",
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () => {
+                    // Delete logic goes here
+                  },
+                },
+              ],
+            );
+          }}
+        >
           <Ionicons name="trash-outline" size={20} color="#4B5563" />
         </Pressable>
       </View>

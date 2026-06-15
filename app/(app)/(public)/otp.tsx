@@ -13,6 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+import { styled } from "nativewind";
+
+const SafeAreaView = styled(RNSafeAreaView);
 
 const OTP_LENGTH = 4;
 const RESEND_SECONDS = 30;
@@ -177,121 +181,129 @@ export default function OtpScreen() {
     : "+91 **********";
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-        bounces={false}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
       >
-        <View
-          style={{
-            paddingHorizontal: 24,
-            paddingTop: 8,
-            paddingBottom: 32,
-            gap: 24,
-          }}
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+          showsVerticalScrollIndicator={false}
         >
           {/* Header */}
-          <View style={{ gap: 4 }}>
-            <Text className="text-xl font-semibold text-gray-800">
-              Verify your number
-            </Text>
-            <Text style={{ fontSize: 13, color: "#9CA3AF", lineHeight: 18 }}>
-              Enter the 4-digit OTP sent to{" "}
-              <Text style={{ color: "#374151", fontWeight: "500" }}>
-                {maskedPhone}
+          <View className="flex-row justify-between items-center px-5 pb-3 pt-3 bg-white border-b border-gray-100">
+            <View className="flex-1">
+              <Text className="text-[18px] font-extrabold text-gray-900 tracking-tight">
+                Verify your number
               </Text>
-            </Text>
+              <Text className="text-[11px] text-gray-400 mt-0.5">
+                OTP sent to <Text className="font-bold text-gray-600">{maskedPhone}</Text>
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+              className="h-8 w-8 bg-gray-100 items-center justify-center rounded-full ml-3"
+            >
+              <Text style={{ fontSize: 16, color: "#4B5563", fontWeight: "bold" }}>✕</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* OTP boxes */}
-          <View style={{ gap: 8 }}>
-            <Animated.View
-              style={{
-                flexDirection: "row",
-                gap: 7,
-                justifyContent: "center",
-                transform: [{ translateX: shakeAnim }],
-              }}
-            >
-              {Array.from({ length: OTP_LENGTH }, (_, i) => {
-                const isFocused = focusedIdx === i;
-                const isFilled = otp[i] !== "";
-                const borderColor = isError
-                  ? "#EF4444"
-                  : isFocused
-                    ? "#F97316"
-                    : isFilled
-                      ? "#D1D5DB"
-                      : "#E5E7EB";
-                const bgColor = isError
-                  ? "#FEF2F2"
-                  : isFocused
-                    ? "#FFF7ED"
-                    : "#F9FAFB";
+          <View
+            style={{
+              paddingHorizontal: 24,
+              paddingTop: 24,
+              paddingBottom: 32,
+              gap: 24,
+            }}
+          >
+            {/* OTP boxes */}
+            <View style={{ gap: 8 }}>
+              <Animated.View
+                style={{
+                  flexDirection: "row",
+                  gap: 7,
+                  justifyContent: "center",
+                  transform: [{ translateX: shakeAnim }],
+                }}
+              >
+                {Array.from({ length: OTP_LENGTH }, (_, i) => {
+                  const isFocused = focusedIdx === i;
+                  const isFilled = otp[i] !== "";
+                  const borderColor = isError
+                    ? "#EF4444"
+                    : isFocused
+                      ? "#F97316"
+                      : isFilled
+                        ? "#D1D5DB"
+                        : "#E5E7EB";
+                  const bgColor = isError
+                    ? "#FEF2F2"
+                    : isFocused
+                      ? "#FFF7ED"
+                      : "#F9FAFB";
 
-                return (
-                  <TextInput
-                    key={i}
-                    ref={(el) => {
-                      inputRefs.current[i] = el;
-                    }}
-                    value={otp[i]}
-                    onChangeText={(text) => handleChange(text, i)}
-                    onKeyPress={({ nativeEvent }) =>
-                      handleKeyPress(nativeEvent.key, i)
-                    }
-                    onFocus={() => setFocusedIdx(i)}
-                    keyboardType="number-pad"
-                    maxLength={OTP_LENGTH}
-                    selectTextOnFocus
-                    style={{
-                      width: 40,
-                      height: 45,
-                      borderRadius: 14,
-                      borderWidth: 1,
-                      borderColor,
-                      backgroundColor: bgColor,
-                      textAlign: "center",
-                      fontSize: 20,
-                      fontWeight: "500",
-                      color: isError ? "#EF4444" : "#111827",
-                    }}
-                  />
-                );
-              })}
-            </Animated.View>
+                  return (
+                    <TextInput
+                      key={i}
+                      ref={(el) => {
+                        inputRefs.current[i] = el;
+                      }}
+                      value={otp[i]}
+                      onChangeText={(text) => handleChange(text, i)}
+                      onKeyPress={({ nativeEvent }) =>
+                        handleKeyPress(nativeEvent.key, i)
+                      }
+                      onFocus={() => setFocusedIdx(i)}
+                      keyboardType="number-pad"
+                      maxLength={OTP_LENGTH}
+                      selectTextOnFocus
+                      style={{
+                        width: 40,
+                        height: 45,
+                        borderRadius: 14,
+                        borderWidth: 1,
+                        borderColor,
+                        backgroundColor: bgColor,
+                        textAlign: "center",
+                        fontSize: 20,
+                        fontWeight: "500",
+                        color: isError ? "#EF4444" : "#111827",
+                      }}
+                    />
+                  );
+                })}
+              </Animated.View>
 
-            {/* Resend */}
-            <View style={{ alignItems: "center" }}>
-              {canResend ? (
-                <TouchableOpacity onPress={handleResend} activeOpacity={0.7}>
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      color: "#F97316",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Resend OTP
+              {/* Resend */}
+              <View style={{ alignItems: "center" }}>
+                {canResend ? (
+                  <TouchableOpacity onPress={handleResend} activeOpacity={0.7}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: "#F97316",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Resend OTP
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{ fontSize: 13, color: "#9CA3AF" }}>
+                    Resend in{" "}
+                    <Text style={{ color: "#374151", fontWeight: "500" }}>
+                      {secondsLeft}s
+                    </Text>
                   </Text>
-                </TouchableOpacity>
-              ) : (
-                <Text style={{ fontSize: 13, color: "#9CA3AF" }}>
-                  Resend in{" "}
-                  <Text style={{ color: "#374151", fontWeight: "500" }}>
-                    {secondsLeft}s
-                  </Text>
-                </Text>
-              )}
+                )}
+              </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

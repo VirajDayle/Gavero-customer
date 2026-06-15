@@ -1,17 +1,17 @@
+import { useScrollToHideTabBar } from "@/src/hooks/useScrollToHideTabBar";
 import { FlashList } from "@shopify/flash-list";
-import { styled } from "nativewind";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import Animated from "react-native-reanimated";
+import ScreenView from "@/src/components/ui/ScreenView";
 import OrderCard, { OrderType } from "@/src/components/orders/OrderCard";
 import RatingBottomSheet from "@/src/components/orders/RatingBottomSheet";
 import { mockOrders } from "@/src/mockData/ordersMock";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
-const SafeAreaView = styled(RNSafeAreaView);
+const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
 
-const TABS = ["Active", "History"];
+const TABS = ["Active", "Refund", "History"];
 
 const ACTIVE_STATUSES = [
   "PENDING",
@@ -22,10 +22,14 @@ const ACTIVE_STATUSES = [
   "READY_FOR_PICKUP",
 ];
 
+const REFUND_STATUSES = ["REJECTED", "CANCELLED", "REFUNDED"];
+
 const Orders = () => {
   const [activeTab, setActiveTab] = useState("Active");
+  const onScroll = useScrollToHideTabBar();
   const ratingBottomSheetRef = useRef<BottomSheetModal>(null);
-  const [selectedOrderForRating, setSelectedOrderForRating] = useState<OrderType | null>(null);
+  const [selectedOrderForRating, setSelectedOrderForRating] =
+    useState<OrderType | null>(null);
 
   const handleRatePress = useCallback((order: OrderType) => {
     setSelectedOrderForRating(order);
@@ -35,17 +39,22 @@ const Orders = () => {
   const filteredOrders = useMemo(() => {
     if (activeTab === "Active") {
       return mockOrders.filter((order) =>
-        ACTIVE_STATUSES.includes(order.statusKey)
+        ACTIVE_STATUSES.includes(order.statusKey),
+      );
+    } else if (activeTab === "Refund") {
+      return mockOrders.filter((order) =>
+        REFUND_STATUSES.includes(order.statusKey),
       );
     } else {
+      // History: all cards except Active
       return mockOrders.filter(
-        (order) => !ACTIVE_STATUSES.includes(order.statusKey)
+        (order) => !ACTIVE_STATUSES.includes(order.statusKey),
       );
     }
   }, [activeTab]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <ScreenView style={{ backgroundColor: "#fff" }}>
       <View className="px-4 flex-1">
         <Text className="text-[24px] font-extrabold text-gray-900 mt-2 tracking-tight">
           My Orders
@@ -88,13 +97,17 @@ const Orders = () => {
           </View>
 
           <View className="flex-1 mt-2">
-            <FlashList
+            <AnimatedFlashList
               data={filteredOrders}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item: any) => item.id}
               showsVerticalScrollIndicator={false}
               estimatedItemSize={250}
+              onScroll={onScroll}
+              scrollEventThrottle={16}
               contentContainerStyle={{ paddingBottom: 100 }}
-              renderItem={({ item }) => <OrderCard order={item} onRatePress={handleRatePress} />}
+              renderItem={({ item }: any) => (
+                <OrderCard order={item} onRatePress={handleRatePress} />
+              )}
               ListEmptyComponent={() => (
                 <View className="py-10 items-center justify-center">
                   <Text className="text-gray-500 font-medium">
@@ -106,14 +119,14 @@ const Orders = () => {
           </View>
         </View>
       </View>
-      
+
       <RatingBottomSheet
         ref={ratingBottomSheetRef}
         shopName={selectedOrderForRating?.shopName}
         deliveryPartnerName={selectedOrderForRating?.deliveryPartnerName}
         deliveryMethod={selectedOrderForRating?.deliveryMethod}
       />
-    </SafeAreaView>
+    </ScreenView>
   );
 };
 

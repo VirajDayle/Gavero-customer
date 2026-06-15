@@ -29,7 +29,7 @@ const ExpandOrder = () => {
   const ratingBottomSheetRef = React.useRef<BottomSheetModal>(null);
 
   // Hardcoded for UI demo, you can pass this via params or fetch it from a store later
-  let currentStatus: OrderStatusKey = "OUT_FOR_DELIVERY";
+  let currentStatus: OrderStatusKey = "DELIVERED";
   let deliveryMethod: "DELIVERY" | "PICKUP" = "DELIVERY";
 
   const gradientColors = [...STATUS[currentStatus].gradient];

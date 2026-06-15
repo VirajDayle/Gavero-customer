@@ -1,7 +1,15 @@
 import type { Product } from "@/src/types/product";
-import React, { memo, useEffect } from "react";
-import { DimensionValue, Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Bookmark, Share } from "lucide-react-native";
+import React, { memo, useEffect } from "react";
+import {
+  DimensionValue,
+  Image,
+  Pressable,
+  Share as RNShare,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -20,8 +28,11 @@ const ProductCard = memo(
     width,
     height,
     onPress,
+    shopName,
+    hideActions,
   }: {
     onPress?: (id: number) => void;
+    shopName?: string;
     item: Product;
     quantity: number;
     onAdd: () => void;
@@ -29,6 +40,7 @@ const ProductCard = memo(
     onDecrement: () => void;
     width?: DimensionValue;
     height?: DimensionValue;
+    hideActions?: boolean;
   }) => {
     const discount =
       item.mrp > item.price
@@ -58,13 +70,17 @@ const ProductCard = memo(
           className="flex-1"
         >
           {/* Image area */}
-          <View className="bg-gray-50 h-36 items-center justify-center relative rounded-2xl">
+          <View className="h-36 items-center justify-center relative rounded-2xl bg-white">
             {/* Image placeholder — add source={item.image} when ready */}
             {/* Image placeholder — add source={item.image} when ready */}
             {item.image ? (
-              <View className="h-full w-full bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
+              <View className="h-full w-full rounded-2xl overflow-hidden border border-gray-200">
                 <Image
-                  source={item.image}
+                  source={
+                    typeof item.image === "string"
+                      ? { uri: item.image }
+                      : item.image
+                  }
                   className={`w-full h-full ${!item.inStock ? "opacity-30" : ""}`}
                   resizeMode="center"
                 />
@@ -132,34 +148,62 @@ const ProductCard = memo(
             </View>
 
             <Text
-              className="text-[12px] font-medium mt-[0.5] leading-4 tracking-wide h-12"
+              className="text-[12px] font-medium mt-[0.5] leading-4 tracking-wide"
               numberOfLines={3}
             >
               {item.title}
             </Text>
 
-            <View className="flex-row items-center justify-start gap-2 mt-2">
+            {shopName && (
               <TouchableOpacity
                 activeOpacity={0.7}
-                className="p-1"
                 onPress={(e) => {
                   e.stopPropagation();
-                  // Add save logic here
+                  // Placeholder for shop navigation
+                  console.log(`Navigate to shop: ${shopName}`);
                 }}
+                className="self-start mt-1 mb-0.5"
               >
-                <Bookmark size={14} color="#4B5563" strokeWidth={2.2} />
+                <Text
+                  className="text-[10px] text-orange-600 font-bold underline"
+                  numberOfLines={1}
+                >
+                  {shopName}
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                className="p-1"
-                onPress={(e) => {
-                  e.stopPropagation();
-                  // Add share logic here
-                }}
-              >
-                <Share size={14} color="#4B5563" strokeWidth={2.2} />
-              </TouchableOpacity>
-            </View>
+            )}
+
+            {!hideActions && (
+              <View className="flex-row items-center justify-start gap-2 mt-2">
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="p-1"
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    // Add save logic here
+                  }}
+                >
+                  <Bookmark size={14} color="#4B5563" strokeWidth={2.2} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="p-1"
+                  onPress={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await RNShare.share({
+                        message: `Check out ${item.title} on Gavero!\n\nPrice: ₹${item.price}\n\nOrder now on Gavero app!`,
+                        title: "Share Product",
+                      });
+                    } catch (error) {
+                      console.log(error);
+                    }
+                  }}
+                >
+                  <Share size={14} color="#4B5563" strokeWidth={2.2} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </Pressable>
       </Animated.View>

@@ -5,17 +5,30 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import React, { forwardRef, useCallback, useMemo } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface CoinsInfoBottomSheetProps {
   onClose?: () => void;
+  headerHeight?: number;
 }
 
 const CoinsInfoBottomSheet = forwardRef<
   BottomSheetModal,
   CoinsInfoBottomSheetProps
->(({ onClose }, ref) => {
-  const snapPoints = useMemo(() => ["60%"], []);
+>(({ onClose, headerHeight = 120 }, ref) => {
+  const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
+  const snapPoints = useMemo(() => {
+    return [height - headerHeight - 24];
+  }, [height, headerHeight]);
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -23,7 +36,7 @@ const CoinsInfoBottomSheet = forwardRef<
         {...props}
         disappearsOnIndex={-1}
         appearsOnIndex={0}
-        opacity={0.5}
+        opacity={0.2}
       />
     ),
     [],
@@ -35,13 +48,30 @@ const CoinsInfoBottomSheet = forwardRef<
       index={0}
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
-      handleIndicatorStyle={{ backgroundColor: "#D1D5DB", width: 40 }}
-      backgroundStyle={{ backgroundColor: "#FFFFFF", borderRadius: 24 }}
+      enableDynamicSizing={false}
+      enableOverDrag={false}
+      enableContentPanningGesture={false}
+      backgroundStyle={{
+        backgroundColor: "#FFFFFF",
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      }}
+      handleComponent={() => (
+        <View className="items-center py-2.5 bg-white rounded-t-[20px]">
+          <View className="w-10 h-1 bg-gray-200 rounded-full" />
+        </View>
+      )}
     >
-      <View className="flex-row justify-between items-center px-5 pb-3 pt-1 bg-white">
-        <Text className="text-[18px] font-extrabold text-gray-900 tracking-tight">
-          Gavero Coins
-        </Text>
+      {/* Sticky Top Header */}
+      <View className="flex-row justify-between items-center px-4 pb-3 border-b border-gray-100 bg-white">
+        <View>
+          <Text className="text-base font-bold text-gray-900 tracking-tight">
+            Gavero Coins
+          </Text>
+          <Text className="text-[11px] text-gray-400 mt-0.5">
+            Earn rewards on every order
+          </Text>
+        </View>
         <Pressable
           onPress={() => {
             if (ref && typeof ref !== "function" && ref.current) {
@@ -49,14 +79,17 @@ const CoinsInfoBottomSheet = forwardRef<
             }
             onClose?.();
           }}
-          className="h-8 w-8 bg-gray-100 items-center justify-center rounded-full active:opacity-70"
+          className="h-7 w-7 bg-gray-100 items-center justify-center rounded-full active:opacity-70"
         >
-          <Ionicons name="close" size={20} color="#4B5563" />
+          <Ionicons name="close" size={16} color="#4B5563" />
         </Pressable>
       </View>
 
       <BottomSheetScrollView
-        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingBottom: insets.bottom + 20,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {/* Dark Theme Hero Banner */}
@@ -101,7 +134,9 @@ const CoinsInfoBottomSheet = forwardRef<
             </Text>
           </View>
           <View className="bg-orange-100 px-2.5 py-1 rounded-lg">
-            <Text className="text-orange-700 font-extrabold text-[11px]">+5</Text>
+            <Text className="text-orange-700 font-extrabold text-[11px]">
+              +5
+            </Text>
           </View>
         </View>
 
@@ -122,7 +157,9 @@ const CoinsInfoBottomSheet = forwardRef<
             </Text>
           </View>
           <View className="bg-blue-100 px-2.5 py-1 rounded-lg">
-            <Text className="text-blue-700 font-extrabold text-[11px]">+10</Text>
+            <Text className="text-blue-700 font-extrabold text-[11px]">
+              +10
+            </Text>
           </View>
         </View>
 
@@ -143,7 +180,9 @@ const CoinsInfoBottomSheet = forwardRef<
             </Text>
           </View>
           <View className="bg-green-100 px-2.5 py-1 rounded-lg">
-            <Text className="text-green-700 font-extrabold text-[11px]">+1</Text>
+            <Text className="text-green-700 font-extrabold text-[11px]">
+              +1
+            </Text>
           </View>
         </View>
       </BottomSheetScrollView>

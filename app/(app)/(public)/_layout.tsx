@@ -77,6 +77,17 @@ const Layout = () => {
           statusBarStyle: "dark",
         }}
       />
+      <Stack.Screen
+        name="coming-soon-categories"
+        options={{
+          headerShown: false,
+          presentation: "formSheet",
+          title: "",
+          sheetAllowedDetents: [0.45],
+          sheetCornerRadius: 24,
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 };

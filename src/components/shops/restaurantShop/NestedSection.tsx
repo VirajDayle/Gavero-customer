@@ -12,16 +12,11 @@ type NestedSectionProps = {
 export const NestedSubSection = ({ subItem, onItemPress }: { subItem: any; onItemPress?: (item: any) => void }) => {
   return (
     <View className="mt-2">
-      <View className="flex-row justify-between items-center bg-white py-0.5">
+      <View className="px-4 py-2 bg-white flex-row justify-between items-center">
         <View className="flex-row items-center">
-          <Text className="text-[15px] font-medium ml-3 text-gray-600">
+          <Text className="text-lg font-bold text-gray-800 tracking-tight">
             {subItem.name}
           </Text>
-          {/* <View className="px-2 py-0.5 rounded-full ml-2">
-            <Text className="text-[13px] font-semibold text-gray-600">
-              {subItem.data.length}
-            </Text>
-          </View> */}
         </View>
       </View>
 
@@ -37,8 +32,8 @@ export const NestedSubSection = ({ subItem, onItemPress }: { subItem: any; onIte
 const NestedSectionComponent = ({ item, onItemPress }: NestedSectionProps) => {
   return (
     <View>
-      <View className="flex-row justify-between items-center bg-white pt-2.5">
-        <Text className="text-lg font-medium ml-3">{item.name}</Text>
+      <View className="px-4 pt-4 pb-2 bg-white flex-row justify-between items-center border-b border-gray-100">
+        <Text className="text-xl font-black text-gray-900 tracking-tight">{item.name}</Text>
       </View>
 
       {item.data.map((subItem) => (

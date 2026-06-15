@@ -1,5 +1,5 @@
 import ExpandRows from "@/src/components/shops/groceryShop/ExpandRows";
-import { SECTIONS } from "@/src/mockData/grocery/sections";
+import { GROCERY_SECTIONS } from "@/src/mockData/grocery/sections";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
@@ -13,7 +13,7 @@ const ExpandRowsPage = () => {
   const { sectionId } = useLocalSearchParams<{ sectionId: string }>();
 
   // Find the top deal section by ID
-  const section = SECTIONS.find((s) => s.id === sectionId);
+  const section = GROCERY_SECTIONS.find((s) => s.id === sectionId);
 
   if (!section || section.type !== "topDeal") {
     return (

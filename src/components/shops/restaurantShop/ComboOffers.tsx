@@ -12,9 +12,9 @@ const ComboOffers: React.FC<ComboOffersProps> = ({ combos, onOpenCombo }) => {
   if (!combos || combos.length === 0) return null;
 
   return (
-    <View className="py-2 bg-white mt-2">
-      <View className="px-4 mb-3">
-        <Text className="text-xl font-extrabold text-gray-900">
+    <View className="py-4 bg-white mt-2 border-y border-gray-100">
+      <View className="px-4 mb-3 flex-row items-center justify-between">
+        <Text className="text-xl font-black text-gray-900 tracking-tight">
           Combo Offers
         </Text>
         {/* <Text className="text-sm font-medium text-gray-500">

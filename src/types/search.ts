@@ -68,9 +68,23 @@ export type HorizontalBrands = {
   brands: BrandItem[];
 };
 
+export type HorizontalShops = {
+  type: "horizontal_shops";
+  id: string;
+  shops: ShopItem[];
+};
+
+export type HorizontalRestaurants = {
+  type: "horizontal_restaurants";
+  id: string;
+  restaurants: RestaurantItem[];
+};
+
 export type SearchListItem =
   | ShopItem
   | HeaderItem
   | HorizontalProducts
   | HorizontalBrands
+  | HorizontalShops
+  | HorizontalRestaurants
   | RestaurantItem;

@@ -89,7 +89,7 @@ const Bundles = React.memo(
         <View className="bg-blue-50 rounded-2xl pt-4 pb-2 border border-blue-100 shadow-sm shadow-blue-200/50 relative">
           {/* Header Title Section */}
           <View className="px-4 mb-3">
-            <Text className="text-lg font-bold text-blue-900 tracking-tight">
+            <Text className="text-xl font-black text-blue-900 tracking-tight">
               {title}
             </Text>
           </View>
@@ -124,8 +124,8 @@ const Bundles = React.memo(
                 </View>
               </View>
 
-              <View className="absolute right-1 -bottom-7 ">
-                <AddCart />
+              <View className="absolute bottom-1 -right-6  ">
+                <AddCart horizontal />
               </View>
             </View>
           )}

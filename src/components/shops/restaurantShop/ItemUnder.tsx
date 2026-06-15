@@ -18,9 +18,9 @@ const ItemUnder: React.FC<ItemUnderProps> = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <View className="py-4 bg-[#fefce8]">
-      <View className="px-4 mb-3">
-        <Text className="text-lg font-extrabold text-gray-900">
+    <View className="py-4 bg-yellow-50 border-y border-yellow-100 mb-2 mt-2">
+      <View className="px-4 mb-3 flex-row items-center justify-between">
+        <Text className="text-xl font-black text-gray-900 tracking-tight">
           Pocket Friendly
         </Text>
         {/* <Text className="text-sm font-medium text-gray-500">

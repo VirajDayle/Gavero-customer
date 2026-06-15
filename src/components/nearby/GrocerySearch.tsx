@@ -1,17 +1,20 @@
+import CatalogueBottomSheet from "@/src/components/ui/CatalogueBottomSheet";
+import { GROCERY_CATEGORIES } from "@/src/mockData/grocery/groceryCategories";
+import ScreenView from "@/src/components/ui/ScreenView";
 import SearchShopsHeader from "@/src/components/ui/SearchShopsHeader";
+import { Ionicons } from "@expo/vector-icons";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
-import { styled } from "nativewind";
 import React, { useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SafeAreaView = styled(RNSafeAreaView);
-
+import HorizontalShops from "@/src/components/ui/HorizontalShops";
 import ShopCard from "@/src/components/ui/ShopCard";
 import { ACTIVE_SHOPS } from "@/src/mockData/shops/searchShops";
 import type { SearchListItem, ShopItem } from "@/src/types/search";
@@ -22,6 +25,8 @@ const AnimatedFlashList = Animated.createAnimatedComponent(
 );
 
 const GrocerySearch = () => {
+  const insets = useSafeAreaInsets();
+  const bottomSheetRef = React.useRef<BottomSheetModal>(null);
   const [shops, setShops] = useState<ShopItem[]>(ACTIVE_SHOPS);
   const previousY = useSharedValue(0);
 
@@ -49,6 +54,18 @@ const GrocerySearch = () => {
       id: "header-active-shops",
     });
     data.push(...activeShops);
+
+    data.push({
+      type: "header",
+      title: "Also sell grocery",
+      id: "header-also-sell-grocery",
+    });
+
+    data.push({
+      type: "horizontal_shops",
+      id: "horizontal-shops",
+      shops: shops.slice(2, 7),
+    });
 
     if (closedShops.length > 0) {
       data.push({
@@ -84,7 +101,7 @@ const GrocerySearch = () => {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <ScreenView style={{ backgroundColor: "#fff" }}>
       <SearchShopsHeader progress={progress} title="Grocery" />
 
       {/* <View className="border-b border-gray-100" /> */}
@@ -96,8 +113,13 @@ const GrocerySearch = () => {
           getItemType={(item: SearchListItem) =>
             "type" in item ? item.type : "shop"
           }
-          ItemSeparatorComponent={({ leadingItem }: any) => {
+          ItemSeparatorComponent={({ leadingItem, trailingItem }: any) => {
             if (leadingItem && leadingItem.type === "header") return null;
+            if (trailingItem && trailingItem.type === "header") return null;
+            if (leadingItem && leadingItem.type === "horizontal_shops")
+              return null;
+            if (trailingItem && trailingItem.type === "horizontal_shops")
+              return null;
             return <View className="border-t border-gray-100" />;
           }}
           // ListHeaderComponent={ShopTopSections}
@@ -113,6 +135,9 @@ const GrocerySearch = () => {
                     </View>
                   </View>
                 );
+              }
+              if (item.type === "horizontal_shops") {
+                return <HorizontalShops shops={item.shops} />;
               }
               return null;
             }
@@ -145,7 +170,30 @@ const GrocerySearch = () => {
           showsVerticalScrollIndicator={false}
         />
       </View>
-    </SafeAreaView>
+
+      {/* Floating All Categories Button */}
+      <Pressable
+        className="absolute right-4 w-14 h-14 rounded-full bg-black items-center justify-center shadow-lg active:scale-[0.98]"
+        style={{
+          bottom: Math.max(insets.bottom + 16, 32),
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 4.65,
+          elevation: 8,
+        }}
+        onPress={() => bottomSheetRef.current?.present()}
+      >
+        <Ionicons name="grid" size={24} color="white" />
+      </Pressable>
+
+      <CatalogueBottomSheet 
+        ref={bottomSheetRef} 
+        categories={GROCERY_CATEGORIES}
+        title="Grocery Categories"
+        themeColor="#166534"
+      />
+    </ScreenView>
   );
 };
 

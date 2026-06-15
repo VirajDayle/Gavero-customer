@@ -1,13 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, {
+import {
   createAnimatedComponent,
+  runOnJS,
   SharedValue,
-  useAnimatedStyle,
-  withTiming,
+  useAnimatedReaction,
 } from "react-native-reanimated";
 import { Ellipse, Svg } from "react-native-svg";
 
@@ -51,19 +50,20 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({
     }
   }, [activeIndex, menuSections.length]);
 
-  // ── Smooth Button Transitions ──
-  const animatedBackButtonStyle = useAnimatedStyle(() => {
-    const threshold =
-      scrollThresholdSv.value > 0 ? scrollThresholdSv.value - 20 : 200;
-    const isSticky = scrollY.value >= threshold;
+  const [isSticky, setIsSticky] = useState(false);
 
-    return {
-      opacity: withTiming(isSticky ? 1 : 0, { duration: 180 }),
-      width: withTiming(isSticky ? 40 : 0, { duration: 180 }),
-      marginRight: withTiming(isSticky ? 3 : 0, { duration: 180 }),
-      marginTop: withTiming(isSticky ? 8 : 0, { duration: 180 }),
-    };
-  });
+  useAnimatedReaction(
+    () => {
+      const threshold =
+        scrollThresholdSv.value > 0 ? scrollThresholdSv.value - 20 : 200;
+      return scrollY.value >= threshold;
+    },
+    (current, prev) => {
+      if (current !== prev) {
+        runOnJS(setIsSticky)(current);
+      }
+    },
+  );
 
   // ── High Performance Tab Item Renderer ──
   const renderCategoryItem = useCallback(
@@ -75,7 +75,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({
           onPress={() => onCategoryPress?.(index)}
           accessibilityRole="tab"
           accessibilityState={{ selected: isActive }}
-          hitSlop={{ top: 15, bottom: 15, left: 10, right: 10 }}
+          hitSlop={{ top: 20, bottom: 20, left: 15, right: 15 }}
           // Added relative positioning to let the absolute border attach to the container edges
           className="px-4 py-1 justify-center items-center relative"
         >
@@ -111,23 +111,25 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({
         className=" bg-black"
         // style={{ backgroundColor: "#B7ECCD" }}
       >
-        <View className="px-3 flex-row items-center justify-between h-14">
-          <Animated.View
-            style={[animatedBackButtonStyle, { overflow: "hidden" }]}
-          >
-            <Pressable
-              className="w-9 h-9 rounded-full bg-zinc-500 items-center justify-center active:opacity-60"
-              hitSlop={8}
-              onPress={() => router.back()}
-            >
-              <Ionicons name="arrow-back" size={22} color="#1a1a1a" />
-            </Pressable>
-          </Animated.View>
-
-          <View className="flex-1 justify-center mt-2">
+        <View className="px-3 flex-row items-center h-14">
+          <View className="flex-1 justify-center mt-2 relative">
             <SearchBar
               className="w-full"
               placeholderText="Search from restaurant..."
+              editable={false}
+              showBackArrow={isSticky}
+              onBackPress={() => router.back()}
+            />
+            {/* Overlay to catch taps on the search bar body without blocking the back button */}
+            <Pressable
+              className="absolute top-0 bottom-0 right-0"
+              style={{ left: isSticky ? 48 : 0 }}
+              onPress={() =>
+                router.push({
+                  pathname: "/(app)/main-search",
+                  params: { context: "Food" },
+                })
+              }
             />
           </View>
         </View>

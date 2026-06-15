@@ -29,6 +29,9 @@ const RestaurantCouponCode = ({ coupons, onOpenSheet }: CouponCodeProps) => {
         width={width}
         height={90} // Slightly taller for better text spacing
         data={coupons}
+        onConfigurePanGesture={(gesture) => {
+          gesture.activeOffsetX([-10, 10]);
+        }}
         onProgressChange={(_, absoluteProgress) => {
           const currentIdx = Math.round(absoluteProgress);
           // Infinite loop index normalizing safety check

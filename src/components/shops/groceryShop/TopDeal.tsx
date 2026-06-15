@@ -14,6 +14,8 @@ type HorizontalProductListProps = {
   onDecrementProduct: (product: Product) => void;
   onSeeAllPress?: () => void;
   emptyMessage?: string;
+  hideItemActions?: boolean;
+  showShopName?: boolean;
 };
 
 // Layout constants for strict FlashList performance metrics
@@ -34,6 +36,8 @@ export const TopDeal = React.memo(
     onDecrementProduct,
     onSeeAllPress,
     emptyMessage = "No products available",
+    hideItemActions,
+    showShopName,
   }: HorizontalProductListProps) => {
     // Memoized Render Item Callback
     const renderItem = useCallback(
@@ -48,12 +52,14 @@ export const TopDeal = React.memo(
               onAdd={() => onAddProduct(item)}
               onIncrement={() => onIncrementProduct(item)}
               onDecrement={() => onDecrementProduct(item)}
-              onPress={(id)=> router.push("/(app)/(auth)/big-grocery")}
+              onPress={(id) => router.push("/(app)/(auth)/big-grocery")}
+              hideActions={hideItemActions}
+              shopName={showShopName ? item.shopName : undefined}
             />
           </View>
         );
       },
-      [cartQuantities, onAddProduct, onIncrementProduct, onDecrementProduct],
+      [cartQuantities, onAddProduct, onIncrementProduct, onDecrementProduct, hideItemActions, showShopName],
     );
 
     // Fallback UI when the array is empty
@@ -78,12 +84,23 @@ export const TopDeal = React.memo(
     );
 
     return (
-      <View className="py-3 bg-orange-50 mb-2">
+      <View className="pt-2.5 bg-orange-100 border-y border-orange-200 mb-2">
         {/* Header Title Section */}
-        <View className="px-4 mb-3">
-          <Text className="text-lg font-bold text-gray-900 tracking-tight">
+        <View className="px-4 mb-3 flex-row items-center justify-between">
+          <Text className="text-xl font-black text-orange-900 tracking-tight">
             {title}
           </Text>
+          {onSeeAllPress && products.length > 0 && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onSeeAllPress}
+              className="bg-white/80 px-3 py-1 rounded-full border border-orange-200 shadow-sm"
+            >
+              <Text className="text-xs font-bold text-orange-700 tracking-wide">
+                See All
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Optimized Horizontal List */}
@@ -99,20 +116,7 @@ export const TopDeal = React.memo(
           contentContainerStyle={listContainerStyle}
         />
 
-        {/* Production-grade 'See All' Bottom Trigger */}
-        {onSeeAllPress && products.length > 0 && (
-          <View className="px-4 mt-4">
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={onSeeAllPress}
-              className="w-full py-2.5 bg-gray-50 rounded-xl border border-gray-100 flex-row items-center justify-center"
-            >
-              <Text className="text-xs font-semibold text-orange-600 tracking-wide">
-                See All Items
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        {/* Bottom space padding if needed, otherwise removed the large button */}
       </View>
     );
   },

@@ -11,7 +11,7 @@ const QuickGo = ({ title, categories, onCategoryPress }: QuickGoProps) => {
   return (
     <View className="px-4 py-2">
       <View className="bg-blue-50 rounded-2xl p-4 border border-blue-100 shadow-sm shadow-blue-200/50">
-        <Text className="text-lg font-bold text-blue-900 mb-3 tracking-tight">
+        <Text className="text-xl font-black text-blue-900 mb-3 tracking-tight">
           {title}
         </Text>
         <View className="flex-row flex-wrap justify-between gap-y-4">

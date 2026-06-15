@@ -16,10 +16,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
 
@@ -409,8 +406,10 @@ const BigGroceryPage = () => {
     },
   });
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingTop: insets.top }}>
       <View
         style={{
           flex: 1,
@@ -446,7 +445,7 @@ const BigGroceryPage = () => {
 
         {scrollEnabled && (
           <Animated.View
-            className="absolute bottom-4 left-0 right-0 h-20 z-10 "
+            className="absolute bottom-16 left-0 right-0 h-20 z-10 "
             pointerEvents="box-none"
           >
             <Animated.ScrollView
@@ -490,7 +489,7 @@ const BigGroceryPage = () => {
           </Animated.View>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

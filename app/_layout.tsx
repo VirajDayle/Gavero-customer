@@ -1,14 +1,28 @@
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+} from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
+
+// Defined outside component to prevent re-creation on every render
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#ffffff",
+  },
+};
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -28,23 +42,19 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
-  const MyTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      background: "#ffffff", // This makes ALL screens default to pure white!
-    },
-  };
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider value={MyTheme}>
-          <BottomSheetModalProvider>
-            <Slot />
-          </BottomSheetModalProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      {/* StatusBar style — stable, does not trigger window inset re-layouts */}
+      <StatusBar style="dark" />
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider value={MyTheme}>
+            <BottomSheetModalProvider>
+              <Slot />
+            </BottomSheetModalProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

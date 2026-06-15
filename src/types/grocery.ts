@@ -5,6 +5,7 @@ import type { Product } from "./product";
 export interface SubSectionProp {
   id: string;
   title: string;
+  image?: any;
   products?: any[];
 }
 
@@ -69,6 +70,8 @@ export type GoToSection = {
   type: "goToSection";
   title: string;
   data: Product[];
+  targetCategoryId?: string;
+  targetSubCategoryId?: string;
 };
 
 export type BundleSection = {

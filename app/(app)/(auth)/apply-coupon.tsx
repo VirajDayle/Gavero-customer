@@ -32,24 +32,31 @@ const RESTAURANT_COUPONS: Coupon[] = [
 
 const ApplyCoupon = () => {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<"Grocery" | "Restaurant">("Grocery");
+  const [selectedCategory, setSelectedCategory] = useState<
+    "Grocery" | "Restaurant"
+  >("Grocery");
   const [selectedCoupons, setSelectedCoupons] = useState<string[]>([]);
 
   const toggleCoupon = (id: string) => {
     setSelectedCoupons((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
   };
 
-  const activeCoupons = selectedCategory === "Grocery" ? MOCK_COUPONS : RESTAURANT_COUPONS;
+  const activeCoupons =
+    selectedCategory === "Grocery" ? MOCK_COUPONS : RESTAURANT_COUPONS;
 
   return (
     <SafeAreaView className="flex-1 bg-[#FAFAF7]">
       <Header title="Apply Coupon" back border />
-      
+
       {/* Category Chips */}
       <View className="py-4 bg-white border-b border-gray-100">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-5">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="px-5"
+        >
           <Pressable
             onPress={() => setSelectedCategory("Grocery")}
             className={`px-6 py-2 rounded-full border mr-3 ${
@@ -76,7 +83,9 @@ const ApplyCoupon = () => {
           >
             <Text
               className={`font-semibold ${
-                selectedCategory === "Restaurant" ? "text-white" : "text-gray-600"
+                selectedCategory === "Restaurant"
+                  ? "text-white"
+                  : "text-gray-600"
               }`}
             >
               Restaurant
@@ -102,7 +111,9 @@ const ApplyCoupon = () => {
                 {/* Checkbox for multiple selection */}
                 <View
                   className={`h-5 w-5 rounded-[6px] border-[1.5px] mt-0.5 mr-3 items-center justify-center ${
-                    isSelected ? "border-orange-500 bg-orange-500" : "border-gray-300 bg-transparent"
+                    isSelected
+                      ? "border-orange-500 bg-orange-500"
+                      : "border-gray-300 bg-transparent"
                   }`}
                 >
                   {isSelected && (
@@ -142,7 +153,9 @@ const ApplyCoupon = () => {
       <View className="px-5 py-4 border-t border-gray-200 bg-white">
         <Pressable
           className={`px-10 py-3.5 rounded-2xl items-center ${
-            selectedCoupons.length > 0 ? "bg-orange-500 active:bg-orange-600" : "bg-gray-300"
+            selectedCoupons.length > 0
+              ? "bg-orange-500 active:bg-orange-600"
+              : "bg-gray-300"
           }`}
           disabled={selectedCoupons.length === 0}
           onPress={() => router.back()}
@@ -152,7 +165,8 @@ const ApplyCoupon = () => {
               selectedCoupons.length > 0 ? "text-white" : "text-gray-500"
             }`}
           >
-            APPLY {selectedCoupons.length > 0 ? `(${selectedCoupons.length})` : ""}
+            APPLY{" "}
+            {selectedCoupons.length > 0 ? `(${selectedCoupons.length})` : ""}
           </Text>
         </Pressable>
       </View>

@@ -42,7 +42,7 @@ export interface MenuItemProps {
   options: PizzaOption[];
 }
 
-const MOCK_DATA_LIST: MenuItemProps[] = [
+export const MOCK_DATA_LIST: MenuItemProps[] = [
   {
     name: "Margherita Pizza",
     description:

@@ -7,9 +7,18 @@ import {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
+import { ShoppingBasket, UtensilsCrossed } from "lucide-react-native";
 import { styled } from "nativewind";
 import React, { useCallback, useRef, useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import {
   SafeAreaView as RNSafeAreaView,
@@ -225,6 +234,8 @@ const ViewCart = () => {
   );
 
   const [selectedCoupon, setSelectedCoupon] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [useGaveroCoins, setUseGaveroCoins] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<"delivery" | "pickup">(
     "delivery",
   );
@@ -234,13 +245,16 @@ const ViewCart = () => {
   const [pickupTime, setPickupTime] = useState<string>("10:00 AM - 12:00 PM");
   const [selectedTip, setSelectedTip] = useState<number | null>(null);
 
+  const gaveroCoinDiscount = useGaveroCoins ? 150 : 0; // Example discount
+
   const totalAmount =
     1521 +
     350 +
     (deliveryMethod === "pickup" ? 0 : 40) +
     5 +
     (deliveryMethod === "delivery" && selectedTip ? selectedTip : 0) -
-    (selectedCoupon ? 50 : 0);
+    (selectedCoupon ? 50 : 0) -
+    gaveroCoinDiscount;
 
   return (
     <SafeAreaView className="flex-1 bg-[#FAFAF7]">
@@ -295,28 +309,25 @@ const ViewCart = () => {
             </View>
           </View>
 
-          <View className="flex-row mx-5 gap-2 items-center justify-center">
-            <View className="h-17 w-17 p-2 border border-gray-400 bg-[#B7ECCD] rounded-xl">
-              <Image
-                source={require("../../../src/assets/images/shopCategeory/groceryActive.png")}
-                className="h-full w-full"
-                resizeMode="contain"
-              />
+          <View className="flex-row mx-4 gap-3 items-center justify-start mt-2">
+            <View className="h-18 w-18 pt-2 pb-1.5 items-center justify-center border border-[#C0C0C0] bg-[#016630] rounded-2xl">
+              <ShoppingBasket size={28} color="#FFFFFF" strokeWidth={2} />
+              <Text className="text-[10px] text-white font-medium mt-1">
+                Grocery
+              </Text>
             </View>
-            <View className="h-17 w-17 p-2 border border-gray-400 rounded-xl">
-              <Image
-                source={require("../../../src/assets/images/shopCategeory/restaurant.png")}
-                className="h-full w-full"
-                resizeMode="contain"
-              />
+            <View className="h-18 w-18 pt-2 pb-1.5 items-center justify-center border border-gray-300 rounded-2xl bg-white">
+              <UtensilsCrossed size={28} color="#000000" strokeWidth={2} />
+              <Text className="text-[10px] text-black font-medium mt-1">
+                Food
+              </Text>
             </View>
           </View>
 
           <View className="mx-3 mt-4 pb-3 gap-1.5">
             {GROCERY_ITEMS.map((item, index) => (
-              <>
+              <React.Fragment key={index}>
                 <GroceryCardItem
-                  key={index}
                   name={item.name}
                   image={item.image}
                   price={item.price}
@@ -325,31 +336,163 @@ const ViewCart = () => {
                 {index !== GROCERY_ITEMS.length - 1 && (
                   <View className="border-b border-gray-200" />
                 )}
-              </>
+              </React.Fragment>
             ))}
           </View>
         </View>
         {/* Apply Coupon */}
-        <Pressable
-          onPress={() => router.push("/apply-coupon")}
-          className="flex-row items-center justify-between mx-3 border border-gray-100 mt-2 rounded-2xl p-4 bg-white"
-        >
-          <View className="flex-row items-center gap-3">
-            <View className="h-8 w-8">
-              <Image
-                source={require("@/src/assets/images/groceryShop/offer.png")}
-                className="h-full w-full"
-                resizeMode="contain"
-              />
+        <View className="mx-3 mt-3 rounded-xl bg-white">
+          {/* Top section: Choose from list */}
+          <Pressable
+            onPress={() => router.push("/apply-coupon")}
+            className="flex-row items-center justify-between p-4"
+          >
+            <View className="flex-row items-center gap-3">
+              <View className="h-9 w-9 bg-orange-50 rounded-full items-center justify-center border border-orange-100">
+                <Image
+                  source={require("@/src/assets/images/groceryShop/offer.png")}
+                  className="h-5 w-5"
+                  resizeMode="contain"
+                />
+              </View>
+              <View>
+                <Text className="text-[15px] font-bold text-gray-800">
+                  Offers & Benefits
+                </Text>
+                <Text className="text-[12px] text-gray-500 mt-0.5 font-medium">
+                  View available coupons
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text className="text-[15px] font-semibold text-gray-800">
-                Apply Coupon
-              </Text>
+            <View className="h-7 w-7 rounded-full bg-gray-50 items-center justify-center border border-gray-100">
+              <Ionicons name="chevron-forward" size={16} color="#6b7280" />
+            </View>
+          </Pressable>
+
+          <View className="mx-4 h-[1px] bg-gray-100" />
+
+          {/* Bottom section: Manual Input */}
+          <View className="p-4 pt-3">
+            {selectedCoupon ? (
+              <View className="flex-row items-center justify-between border border-green-200 bg-green-50/50 rounded-xl px-4 py-3">
+                <View className="flex-row items-center gap-2">
+                  <View className="bg-green-100 rounded-full p-1">
+                    <Ionicons
+                      name="checkmark-sharp"
+                      size={14}
+                      color="#16a34a"
+                    />
+                  </View>
+                  <Text className="text-[14px] font-extrabold text-green-700 tracking-wider">
+                    {selectedCoupon}
+                  </Text>
+                  <Text className="text-[12px] font-semibold text-green-600 ml-1">
+                    APPLIED
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => {
+                    setSelectedCoupon(null);
+                    setCouponInput("");
+                  }}
+                  className="px-2 py-1"
+                >
+                  <Text className="text-red-500 text-[12px] font-bold">
+                    Remove
+                  </Text>
+                </Pressable>
+              </View>
+            ) : (
+              <View className="flex-row items-center justify-between border border-gray-200 rounded-xl pl-3 pr-1 py-1 bg-[#F9FAFB]">
+                <Ionicons name="ticket-outline" size={18} color="#9ca3af" />
+                <TextInput
+                  placeholder="Enter coupon code"
+                  placeholderTextColor="#9ca3af"
+                  className="flex-1 ml-2 py-2 text-[14px] text-gray-800 font-semibold"
+                  value={couponInput}
+                  onChangeText={setCouponInput}
+                  autoCapitalize="characters"
+                />
+                <Pressable
+                  onPress={() => {
+                    if (couponInput.trim()) {
+                      setSelectedCoupon(couponInput.trim().toUpperCase());
+                    }
+                  }}
+                  className={`px-5 py-2.5 rounded-lg ml-2 ${couponInput.trim() ? "bg-orange-500 shadow-sm" : "bg-gray-200"}`}
+                  disabled={!couponInput.trim()}
+                >
+                  <Text
+                    className={`text-[13px] font-bold ${couponInput.trim() ? "text-white" : "text-gray-400"}`}
+                  >
+                    Apply
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* Gavero Coins */}
+        <View
+          className={`mx-3 mt-3 rounded-2xl overflow-hidden ${useGaveroCoins ? "border border-orange-200" : "border border-transparent"}`}
+          style={{
+            backgroundColor: useGaveroCoins ? "#FFFaf0" : "#ffffff",
+          }}
+        >
+          <View className="p-4 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-3 flex-1">
+              <View className="h-10 w-10">
+                <Image
+                  source={require("@/src/assets/images/profile/gaveroCoins.png")}
+                  className="h-full w-full"
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="text-[15px] font-bold text-gray-800">
+                  Redeem Gavero Coins
+                </Text>
+                <View className="flex-row items-center mt-0.5">
+                  <Text className="text-[12px] font-medium text-gray-500">
+                    Balance:
+                  </Text>
+                  <Text className="text-[12px] font-bold text-orange-500 ml-1">
+                    450 Coins
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <Switch
+              value={useGaveroCoins}
+              onValueChange={setUseGaveroCoins}
+              trackColor={{ false: "#e5e7eb", true: "#fdba74" }}
+              thumbColor={useGaveroCoins ? "#ea580c" : "#f3f4f6"}
+              style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
+            />
+          </View>
+
+          {/* Note Section */}
+          <View className="px-4 pb-4 pt-1">
+            <View
+              className={`flex-row items-start bg-orange-50/80 rounded-xl p-3 border border-orange-100 ${useGaveroCoins ? "bg-orange-100/50" : ""}`}
+            >
+              <Ionicons
+                name="information-circle"
+                size={16}
+                color="#ea580c"
+                style={{ marginTop: 2 }}
+              />
+              <View className="ml-2 flex-1">
+                <Text className="text-[12px] text-orange-800 font-medium leading-4">
+                  You can pay up to <Text className="font-bold">25%</Text> of
+                  your total payment amount using Gavero coins.
+                </Text>
+              </View>
             </View>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#6b7280" />
-        </Pressable>
+        </View>
+
         {/* Delivery / Pickup Options */}
         <View className="mx-3 border border-gray-100 mt-2 rounded-2xl p-4 bg-white ">
           {/* Segmented Control */}
@@ -602,6 +745,16 @@ const ViewCart = () => {
                 </Text>
                 <Text className="text-[13px] font-medium text-green-600">
                   -₹50
+                </Text>
+              </View>
+            )}
+            {useGaveroCoins && (
+              <View className="flex-row justify-between items-center">
+                <Text className="text-[13px] text-orange-500 font-medium">
+                  Gavero Coins Redeemed
+                </Text>
+                <Text className="text-[13px] font-medium text-orange-500">
+                  -₹{gaveroCoinDiscount}
                 </Text>
               </View>
             )}

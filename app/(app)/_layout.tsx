@@ -5,12 +5,21 @@ const RootNav = () => {
   return (
     <Stack
       screenOptions={{
-        statusBarStyle: "dark",
+        headerShown: false,
       }}
     >
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(public)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="main-search"
+        options={{
+          headerShown: false,
+          presentation: "fullScreenModal",
+          animation: "slide_from_bottom",
+          animationDuration: 100,
+        }}
+      />
       <Stack.Screen
         name="select-address"
         options={{

@@ -67,7 +67,7 @@ const ExpandRows = ({ title, products }: ExpandRowsProps) => {
     <View className="flex-1 bg-white">
       {!!title && (
         <View className="px-4 py-4 border-b border-gray-100">
-          <Text className="text-xl font-bold text-gray-900 tracking-tight">
+          <Text className="text-xl font-black text-gray-900 tracking-tight">
             {title}
           </Text>
         </View>

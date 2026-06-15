@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Bookmark, Share } from "lucide-react-native";
 import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Share as RNShare, Text, TouchableOpacity, View } from "react-native";
 import AddCart from "../groceryShop/AddCart";
 import { Item } from "./type";
 
@@ -122,9 +122,16 @@ const FoodCard: React.FC<FoodCardProps> = ({ item, onPress, className }) => {
           <TouchableOpacity
             activeOpacity={0.7}
             className="p-1"
-            onPress={(e) => {
+            onPress={async (e) => {
               e.stopPropagation();
-              // Add share logic here
+              try {
+                await RNShare.share({
+                  message: `Check out ${name} on Gavero!\n\nPrice: ${currency}${price}\n\nOrder now on Gavero app!`,
+                  title: "Share Food",
+                });
+              } catch (error) {
+                console.log(error);
+              }
             }}
           >
             <Share size={15} color="#4B5563" strokeWidth={2.2} />

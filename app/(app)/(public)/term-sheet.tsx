@@ -37,26 +37,29 @@ export default function TermsSheet() {
 
       {/*
        * SafeAreaView is the ROOT — no wrapping View with flex:1 around it.
-       * edges={["bottom"]} only — "top" adds unwanted padding inside formSheet.
-       * flex:1 here fills the entire sheet detent height.
+       * flex:1 here fills the entire screen/sheet detent height.
        */}
-      <SafeAreaView style={styles.root} edges={["bottom"]}>
-        {/* Header — direct child of SafeAreaView, sibling of ScrollView */}
-        <View style={styles.header}>
-          <View style={styles.headerText}>
-            <Text className="title-subheading">{title}</Text>
-            <Text style={styles.subtitle}>Last updated: May 11, 2026</Text>
+      <SafeAreaView style={styles.root}>
+        {/* Header */}
+        <View className="flex-row justify-between items-center px-5 pb-3 pt-3 bg-white border-b border-gray-100">
+          <View className="flex-1">
+            <Text className="text-[18px] font-extrabold text-gray-900 tracking-tight">
+              {title}
+            </Text>
+            <Text className="text-[11px] text-gray-400 mt-0.5">
+              Last updated: May 11, 2026
+            </Text>
           </View>
 
           <TouchableOpacity
             onPress={handleClose}
             activeOpacity={0.7}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            style={styles.closeButton}
+            className="h-8 w-8 bg-gray-100 items-center justify-center rounded-full ml-3"
             accessibilityLabel="Close"
             accessibilityRole="button"
           >
-            <Ionicons name="close" size={16} color="#6B7280" />
+            <Ionicons name="close" size={20} color="#4B5563" />
           </TouchableOpacity>
         </View>
 
@@ -116,43 +119,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#F3F4F6",
-  },
-
-  headerText: {
-    flex: 1,
-  },
-
-  // title: {
-  //   fontSize: 18,
-  //   fontWeight: "700",
-  //   color: "#1F2937",
-  // },
-
-  subtitle: {
-    fontSize: 11,
-    color: "#9CA3AF",
-    marginTop: 2,
-  },
-
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#F3F4F6",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
   },
 
   scrollView: {

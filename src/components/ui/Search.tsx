@@ -17,7 +17,7 @@ export interface HomeHeaderProps {
 const PLACEHOLDERS = ["Rice and Wheat", "Imart", "Panchvati Restaurant"];
 const ITEM_HEIGHT = 24;
 
-const Search = ({ placeholders, className }: HomeHeaderProps) => {
+const Search = ({ placeholders = PLACEHOLDERS, className }: HomeHeaderProps) => {
   const [searchInput, setSearchInput] = useState("");
   const [index, setIndex] = useState(0);
   const translateY = useRef(new Animated.Value(0)).current;
@@ -41,7 +41,8 @@ const Search = ({ placeholders, className }: HomeHeaderProps) => {
           if (!finished || cancelled) return;
 
           // CHANGE WORD IMMEDIATELY
-          indexRef.current = (indexRef.current + 1) % placeholders.length;
+          const currentPlaceholders = placeholders?.length > 0 ? placeholders : PLACEHOLDERS;
+          indexRef.current = (indexRef.current + 1) % currentPlaceholders.length;
 
           setIndex(indexRef.current);
 
@@ -68,7 +69,7 @@ const Search = ({ placeholders, className }: HomeHeaderProps) => {
       translateY.stopAnimation();
       translateY.setValue(0);
     };
-  }, []);
+  }, [placeholders]);
 
   return (
     <View className={clsx(className)}>
@@ -106,7 +107,7 @@ const Search = ({ placeholders, className }: HomeHeaderProps) => {
                   transform: [{ translateY }],
                 }}
               >
-                {PLACEHOLDERS[index]}
+                {(placeholders?.length > 0 ? placeholders : PLACEHOLDERS)[index]}
               </Animated.Text>
             </View>
           )}

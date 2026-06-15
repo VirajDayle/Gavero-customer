@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import clsx from "clsx";
+import { Heart } from "lucide-react-native";
 import React from "react";
 import {
   Image,
@@ -38,6 +39,7 @@ const ShopCard: React.FC<ShopCardProps> = ({
   onSavePress,
   onPress,
   rating,
+  isSaved,
 }) => {
   return (
     <Pressable
@@ -60,19 +62,38 @@ const ShopCard: React.FC<ShopCardProps> = ({
 
       {/* Center — info */}
       <View className="flex-1 gap-1.5 min-w-0">
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center justify-between ">
           <Text
             className="flex-1 text-[14.5px] font-bold text-gray-900 pr-2"
             numberOfLines={1}
           >
             {name}
           </Text>
-          {rating ? (
-            <View className="flex-row items-center bg-green-700 px-1.5 py-0.5 rounded gap-0.5 min-w-[36px] justify-center">
-              <Text className="text-[10px] font-bold text-white">{Number(rating).toFixed(1)}</Text>
-              <Ionicons name="star" size={9} color="#fcd34d" />
-            </View>
-          ) : null}
+          <View className="flex-row items-center gap-2">
+            {rating ? (
+              <View className="flex-row items-center bg-green-700 px-1 py-[2px] rounded gap-0.5 justify-center">
+                <Text className="text-[9px] font-bold text-white">
+                  {Number(rating).toFixed(1)}
+                </Text>
+                <Ionicons name="star" size={8} color="#fcd34d" />
+              </View>
+            ) : null}
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation();
+                onSavePress && onSavePress();
+              }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              accessibilityRole="checkbox"
+            >
+              <Heart
+                size={18}
+                color={isSaved ? "#EF4444" : "#1f2937"}
+                strokeWidth={1.5}
+                fill={isSaved ? "#EF4444" : "transparent"}
+              />
+            </Pressable>
+          </View>
         </View>
         {/* 
         {tagline && (
@@ -81,7 +102,7 @@ const ShopCard: React.FC<ShopCardProps> = ({
           </Text>
         )} */}
 
-        <View className="flex-row items-center gap-1.5">
+        <View className="flex-row items-center gap-1.5 mt-0.5">
           <View className="flex-row items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5">
             <Ionicons name="time-outline" size={13} color="#6B7280" />
             <Text className="text-xs font-medium text-gray-600">

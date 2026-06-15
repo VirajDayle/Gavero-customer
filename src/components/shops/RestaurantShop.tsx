@@ -19,14 +19,14 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import NewShopHeader from "../ui/NewShopHeader";
 import ShopTopSections from "../ui/ShopTopSections";
 import { CouponExpandableRow } from "./groceryShop/CouponExpandableRow";
 import BigFoodItem from "./restaurantShop/BigFoodItem";
 import ComboOfferDetails from "./restaurantShop/ComboOfferDetails";
 import ComboOffers from "./restaurantShop/ComboOffers";
-import FlatendSection from "./restaurantShop/FlatendSection";
+import { FoodItemCard } from "./restaurantShop/FoodItem";
 import ItemUnder from "./restaurantShop/ItemUnder";
-import { NestedSubSection } from "./restaurantShop/NestedSection";
 import RecommendedForYou from "./restaurantShop/RecommendedForYou";
 import RestaurantCouponCode from "./restaurantShop/RestaurantCouponCode";
 import RestaurantFilter, {
@@ -64,18 +64,20 @@ const AnimatedFlashList = createAnimatedComponent(
 ) as unknown as React.FC<any>;
 
 const HeaderSpacerItem = ({
-  style,
   currentShop,
   changeShop,
   onLayout,
+  scrollY,
+  headerHeightSv,
 }: {
-  style: any;
   currentShop: ShopType;
   changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
   onLayout?: (e: any) => void;
+  scrollY: SharedValue<number>;
+  headerHeightSv: SharedValue<number>;
 }) => (
   <View onLayout={onLayout}>
-    <Animated.View style={style} />
+    <NewShopHeader headerHeightSv={headerHeightSv} scrollY={scrollY} />
     <View className="bg-[#FAFAF7]">
       <ShopTopSections currentShop={currentShop} changeShop={changeShop} />
     </View>
@@ -339,12 +341,42 @@ const RestaurantShop = ({
     filteredSections.forEach((sec, sIdx) => {
       sIndices[sIdx] = flat.length;
       if (sec.type === "flat-section") {
-        flat.push({ ...sec, sectionIndex: sIdx });
+        flat.push({
+          type: "flat-section-header",
+          name: sec.name,
+          sectionIndex: sIdx,
+        });
+        sec.data.forEach((item, index) => {
+          flat.push({
+            ...item,
+            type: "food-item",
+            sectionIndex: sIdx,
+            isLastInSection: index === sec.data.length - 1,
+          });
+        });
       } else if (sec.type === "nested-section") {
-        flat.push({ ...sec, type: "nested-header", sectionIndex: sIdx });
+        flat.push({
+          type: "nested-header",
+          name: sec.name,
+          sectionIndex: sIdx,
+        });
         sec.data.forEach((sub) => {
           subIndices[sub.id] = flat.length;
-          flat.push({ ...sub, type: "nested-sub-section", sectionIndex: sIdx });
+          flat.push({
+            type: "nested-sub-header",
+            name: sub.name,
+            sectionIndex: sIdx,
+            id: sub.id,
+          });
+          sub.data.forEach((item, index) => {
+            flat.push({
+              ...item,
+              type: "food-item",
+              sectionIndex: sIdx,
+              subSectionId: sub.id,
+              isLastInSection: index === sub.data.length - 1,
+            });
+          });
         });
       }
     });
@@ -363,9 +395,10 @@ const RestaurantShop = ({
       if (viewableItems.length > 0) {
         const sectionItems = viewableItems.filter(
           (v) =>
-            v.item.type === "flat-section" ||
+            v.item.type === "flat-section-header" ||
             v.item.type === "nested-header" ||
-            v.item.type === "nested-sub-section",
+            v.item.type === "nested-sub-header" ||
+            v.item.type === "food-item",
         );
 
         if (sectionItems.length > 0) {
@@ -384,18 +417,20 @@ const RestaurantShop = ({
   const onCategoryPress = useCallback(
     (index: number) => {
       isUserScrolling.current = false;
-
       setActiveIndex(index);
       const targetIndex = sectionIndices[index];
 
-      if (targetIndex != null) {
-        flatlistRef.current?.scrollToIndex({
-          index: targetIndex,
-          animated: true,
-          viewPosition: 0,
-          viewOffset: -100, // Increased to keep item below sticky header + padding
-        });
-      }
+      // Defer the heavy animated scroll computation to let the UI update (chip highlight) instantly
+      setTimeout(() => {
+        if (targetIndex != null) {
+          flatlistRef.current?.scrollToIndex({
+            index: targetIndex,
+            animated: true,
+            viewPosition: 0,
+            viewOffset: -100, // Increased to keep item below sticky header + padding
+          });
+        }
+      }, 50);
     },
     [sectionIndices],
   );
@@ -414,18 +449,46 @@ const RestaurantShop = ({
       setActiveIndex(parentIndex);
       const targetIndex = subSectionIndices[subId];
 
-      if (targetIndex != null) {
-        flatlistRef.current?.scrollToIndex({
-          index: targetIndex,
-          animated: true,
-          viewPosition: 0,
-          viewOffset: -140, // Increased offset so subsection titles clear the sticky header curve
-        });
-      }
+      setTimeout(() => {
+        if (targetIndex != null) {
+          flatlistRef.current?.scrollToIndex({
+            index: targetIndex,
+            animated: true,
+            viewPosition: 0,
+            viewOffset: -140, // Increased offset so subsection titles clear the sticky header curve
+          });
+        }
+      }, 50);
+
       bottomSheetModalRef.current?.dismiss();
     },
     [subSectionIndices],
   );
+
+  // Outside header (Header B) - Only visible when sticky
+  const outsideHeaderStyle = useAnimatedStyle(() => {
+    const startY = scrollThresholdSv.value > 0 ? scrollThresholdSv.value : 200;
+    const isSticky = scrollY.value >= startY;
+    return {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      opacity: isSticky ? 1 : 0,
+      transform: [{ translateY: isSticky ? 0 : -9999 }],
+      zIndex: 50,
+      elevation: 50,
+    };
+  });
+
+  // Inside header (Header A) - Only visible when NOT sticky
+  const insideHeaderStyle = useAnimatedStyle(() => {
+    const startY = scrollThresholdSv.value > 0 ? scrollThresholdSv.value : 200;
+    const isSticky = scrollY.value >= startY;
+    return {
+      opacity: isSticky ? 0 : 1,
+    };
+  });
 
   const headerSpacerStyle = useAnimatedStyle(() => ({
     height: headerHeightSv.value,
@@ -437,9 +500,10 @@ const RestaurantShop = ({
         return (
           <View>
             <HeaderSpacerItem
-              style={headerSpacerStyle}
               currentShop={currentShop}
               changeShop={changeShop}
+              scrollY={scrollY}
+              headerHeightSv={headerHeightSv}
               onLayout={(e) => {
                 scrollThresholdSv.value = e.nativeEvent.layout.height;
               }}
@@ -451,7 +515,7 @@ const RestaurantShop = ({
       let content = null;
       if (item.type === "stickyHeader") {
         return (
-          <View className="mb-6 z-10">
+          <Animated.View style={insideHeaderStyle} className="mb-6">
             <StickyHeader
               scrollY={scrollY}
               scrollThresholdSv={scrollThresholdSv}
@@ -459,7 +523,7 @@ const RestaurantShop = ({
               menuSections={filteredSections}
               onCategoryPress={onCategoryPress}
             />
-          </View>
+          </Animated.View>
         );
       } else if (item.type === "restaurantFilter") {
         content = (
@@ -482,12 +546,12 @@ const RestaurantShop = ({
         );
       } else if (item.type === "recommendedForYou") {
         content = (
-          <View className="mb-2">
-            <RecommendedForYou
-              items={item.items}
-              onItemPress={handleOpenFoodItem}
-            />
-          </View>
+          // <View className="mb-2">
+          <RecommendedForYou
+            items={item.items}
+            onItemPress={handleOpenFoodItem}
+          />
+          // </View>
         );
       } else if (item.type === "comboOffers") {
         content = (
@@ -495,18 +559,28 @@ const RestaurantShop = ({
             <ComboOffers combos={item.combos} onOpenCombo={handleOpenCombo} />
           </View>
         );
-      } else if (item.type === "flat-section") {
+      } else if (item.type === "flat-section-header") {
         content = (
-          <View className="mt-3">
-            <FlatendSection item={item} onItemPress={handleOpenFoodItem} />
+          <View className="px-4 py-4 border-b border-gray-100 bg-white flex-row items-center justify-between mt-3">
+            <Text className="text-xl font-black text-gray-900 tracking-tight">
+              {item.name}
+            </Text>
           </View>
         );
       } else if (item.type === "nested-header") {
         content = (
-          <View className="mt-3">
-            <View className="flex-row justify-between items-center bg-white pt-2.5">
-              <Text className="text-lg font-medium ml-3">{item.name}</Text>
-            </View>
+          <View className="px-4 pt-4 pb-2 bg-white flex-row justify-between items-center border-b border-gray-100 mt-3">
+            <Text className="text-xl font-black text-gray-900 tracking-tight">
+              {item.name}
+            </Text>
+          </View>
+        );
+      } else if (item.type === "nested-sub-header") {
+        content = (
+          <View className="mt-2 px-4 py-2 bg-white flex-row justify-between items-center">
+            <Text className="text-lg font-bold text-gray-800 tracking-tight">
+              {item.name}
+            </Text>
           </View>
         );
       } else if (item.type === "restaurantCoupon") {
@@ -518,11 +592,13 @@ const RestaurantShop = ({
             />
           </View>
         );
-      } else if (item.type === "nested-sub-section") {
+      } else if (item.type === "food-item") {
         content = (
-          <View>
-            <NestedSubSection subItem={item} onItemPress={handleOpenFoodItem} />
-          </View>
+          <FoodItemCard
+            item={item}
+            onPress={handleOpenFoodItem}
+            hideBorder={item.isLastInSection}
+          />
         );
       }
 
@@ -534,25 +610,37 @@ const RestaurantShop = ({
       headerSpacerStyle,
       currentShop,
       changeShop,
+      headerHeightSv,
       scrollY,
       scrollThresholdSv,
-      activeIndex,
-      onCategoryPress,
-      filteredSections,
       dietaryFilter,
       handleOpenFoodItem,
+      handleOpenFoodItem,
+      activeIndex,
+      filteredSections,
+      onCategoryPress,
+      insideHeaderStyle,
     ],
   );
   // ← render arrow direction from this subId: sub.id // ← needed for toggle handler
   return (
     <View className="flex-1 z-10">
+      <Animated.View style={outsideHeaderStyle} pointerEvents="box-none">
+        <StickyHeader
+          scrollY={scrollY}
+          scrollThresholdSv={scrollThresholdSv}
+          activeIndex={activeIndex}
+          menuSections={filteredSections}
+          onCategoryPress={onCategoryPress}
+        />
+      </Animated.View>
+
       <AnimatedFlashList
         ref={flatlistRef}
         data={flatData}
         keyExtractor={(item) => (item as SectionItem).id}
         renderItem={renderItem as any}
         getItemType={(item) => (item as SectionItem).type}
-        stickyHeaderIndices={[1]}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         contentContainerStyle={{ paddingBottom: 20 }}

@@ -1,17 +1,17 @@
-import type { CategoryProp } from "@/src/types/grocery";
 import type { Product } from "@/src/types/product";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import clsx from "clsx";
 import { router } from "expo-router";
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Dimensions, FlatList, Pressable, Text, View } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -26,6 +26,7 @@ export interface VerticalExpandedShopsProps {
   /** Any array of categories — top chips, left rail & right products all derived from this */
   data: any[];
   initialTopId?: string;
+  initialSubId?: string;
 }
 
 // ─── CategoryItem (left rail) ─────────────────────────────────────────────────
@@ -82,9 +83,13 @@ const CategoryItem = memo(
               active ? "bg-green-50" : "bg-gray-100",
             )}
           >
-            {item.source || item.icon ? (
+            {item.source || item.icon || item.image ? (
               <Animated.Image
-                source={item.source ?? item.icon}
+                source={
+                  typeof (item.source ?? item.icon ?? item.image) === "string"
+                    ? { uri: item.source ?? item.icon ?? item.image }
+                    : (item.source ?? item.icon ?? item.image)
+                }
                 style={[{ width: "100%", height: "100%" }, imageStyle]}
                 resizeMode="cover"
               />
@@ -173,18 +178,48 @@ const ProductGrid = memo(
 const VerticalExpandedShops = ({
   data,
   initialTopId,
+  initialSubId,
 }: VerticalExpandedShopsProps) => {
+  const topListRef = useRef<FlatList>(null);
+  const leftListRef = useRef<FlatList>(null);
+
   // ── Top chip state (active category) ────────────────────────────────────────
   const [activeTopId, setActiveTopId] = useState<string>(
-    () => initialTopId || (data.length ? String(data[0].id ?? data[0].title) : ""),
+    () =>
+      initialTopId || (data.length ? String(data[0].id ?? data[0].title) : ""),
   );
+
+  useEffect(() => {
+    if (initialTopId) {
+      setActiveTopId(initialTopId);
+    }
+  }, [initialTopId]);
+
+  useEffect(() => {
+    const index = data.findIndex(
+      (d) => String(d.id ?? d.title) === activeTopId,
+    );
+    if (index !== -1 && topListRef.current) {
+      setTimeout(() => {
+        try {
+          topListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0,
+          });
+        } catch (e) {
+          // Ignore scroll errors if list hasn't laid out
+        }
+      }, 100);
+    }
+  }, [activeTopId, data]);
 
   // Active category object
   const activeCategory: any = useMemo(
     () =>
-      data.find(
-        (d) => String(d.id ?? d.title) === activeTopId,
-      ) ?? data[0] ?? null,
+      data.find((d) => String(d.id ?? d.title) === activeTopId) ??
+      data[0] ??
+      null,
     [data, activeTopId],
   );
 
@@ -195,20 +230,49 @@ const VerticalExpandedShops = ({
   );
 
   // ── Left chip state (active sub-section) ────────────────────────────────────
-  const [activeLeftId, setActiveLeftId] = useState<string>(() =>
-    subSections.length ? String(subSections[0].id) : "",
+  const [activeLeftId, setActiveLeftId] = useState<string>(
+    () => initialSubId || (subSections.length ? String(subSections[0].id) : ""),
   );
 
   // Reset left rail when top chip changes
   useEffect(() => {
     if (subSections.length) {
-      setActiveLeftId(String(subSections[0].id));
+      const exists = subSections.some((s) => String(s.id) === activeLeftId);
+      if (!exists) {
+        setActiveLeftId(String(subSections[0].id));
+      }
     }
-  }, [activeTopId]);
+  }, [activeTopId, subSections]);
+
+  useEffect(() => {
+    if (initialSubId) {
+      setActiveLeftId(initialSubId);
+    }
+  }, [initialSubId]);
+
+  useEffect(() => {
+    const index = subSections.findIndex((s) => String(s.id) === activeLeftId);
+    if (index !== -1 && leftListRef.current) {
+      setTimeout(() => {
+        try {
+          leftListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0,
+          });
+        } catch (e) {
+          // Ignore scroll errors
+        }
+      }, 100);
+    }
+  }, [activeLeftId, subSections]);
 
   // Active sub-section object
   const activeSubSection: any = useMemo(
-    () => subSections.find((s) => String(s.id) === activeLeftId) ?? subSections[0] ?? null,
+    () =>
+      subSections.find((s) => String(s.id) === activeLeftId) ??
+      subSections[0] ??
+      null,
     [subSections, activeLeftId],
   );
 
@@ -254,9 +318,19 @@ const VerticalExpandedShops = ({
           </Pressable>
           <View className="flex-1">
             <FlatList
+              ref={topListRef}
               data={data}
               horizontal
               showsHorizontalScrollIndicator={false}
+              onScrollToIndexFailed={(info) => {
+                setTimeout(() => {
+                  topListRef.current?.scrollToIndex({
+                    index: info.index,
+                    animated: true,
+                    viewPosition: 0,
+                  });
+                }, 500);
+              }}
               keyExtractor={(item) => String(item.id ?? item.title)}
               ItemSeparatorComponent={() => <View className="w-3" />}
               contentContainerStyle={{ alignItems: "center" }}
@@ -299,8 +373,18 @@ const VerticalExpandedShops = ({
           }}
         >
           <FlatList
+            ref={leftListRef}
             data={subSections}
             keyExtractor={(item) => String(item.id)}
+            onScrollToIndexFailed={(info) => {
+              setTimeout(() => {
+                leftListRef.current?.scrollToIndex({
+                  index: info.index,
+                  animated: true,
+                  viewPosition: 0,
+                });
+              }, 500);
+            }}
             renderItem={({ item }) => {
               const key = String(item.id);
               return (

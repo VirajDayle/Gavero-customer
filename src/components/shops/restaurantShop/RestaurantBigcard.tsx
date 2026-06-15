@@ -34,6 +34,7 @@ export interface RestaurantBigcardProps {
   couponCode?: string;
   isClosed?: boolean;
   isCentered?: boolean;
+  customWidth?: number;
 }
 
 interface ImageCarouselProps {
@@ -163,9 +164,10 @@ const RestaurantBigcard = ({
   couponCode,
   isClosed = false,
   isCentered = true,
+  customWidth,
 }: RestaurantBigcardProps) => {
   const { width: windowWidth } = useWindowDimensions();
-  const cardWidth = windowWidth - 32;
+  const cardWidth = customWidth ?? windowWidth - 32;
 
   return (
     <Pressable
@@ -257,4 +259,12 @@ const RestaurantBigcard = ({
   );
 };
 
-export default memo(RestaurantBigcard);
+export default memo(RestaurantBigcard, (prevProps, nextProps) => {
+  return (
+    prevProps.isCentered === nextProps.isCentered &&
+    prevProps.isSaved === nextProps.isSaved &&
+    prevProps.isClosed === nextProps.isClosed &&
+    prevProps.isFastest === nextProps.isFastest &&
+    prevProps.name === nextProps.name
+  );
+});

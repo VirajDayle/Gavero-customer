@@ -16,9 +16,9 @@ const RecommendedForYou: React.FC<RecommendedForYouProps> = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <View className="py-2 px-4 bg-white mt-2">
-      <View className="mb-4">
-        <Text className="text-xl font-extrabold text-gray-900">
+    <View className="py-4 px-4 bg-white mt-2 border-y border-gray-100">
+      <View className="mb-4 flex-row items-center justify-between">
+        <Text className="text-xl font-black text-gray-900 tracking-tight">
           Recommended for you
         </Text>
         {/* <Text className="text-sm font-medium text-gray-500">

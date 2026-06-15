@@ -1,6 +1,5 @@
 import type { Product } from "@/src/types/product";
 import { FlashList } from "@shopify/flash-list";
-import { Clock } from "lucide-react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import ProductCard from "./ProductCard";
@@ -45,13 +44,14 @@ export const FlashSale = React.memo(
     onDecrementProduct,
     emptyMessage = "No flash deals left!",
   }: FlashSaleProps) => {
-    
     // Timer state
-    const [timeLeft, setTimeLeft] = useState(() => formatTime(new Date(endTime).getTime() - Date.now()));
+    const [timeLeft, setTimeLeft] = useState(() =>
+      formatTime(new Date(endTime).getTime() - Date.now()),
+    );
 
     useEffect(() => {
       const targetTime = new Date(endTime).getTime();
-      
+
       const interval = setInterval(() => {
         const remaining = targetTime - Date.now();
         if (remaining <= 0) {
@@ -104,28 +104,40 @@ export const FlashSale = React.memo(
     );
 
     return (
-      <View className="py-3 bg-red-50/80 mb-2">
+      <View className="pt-2.5 bg-rose-50 border-y border-rose-100 mb-2">
         {/* Header Title Section */}
         <View className="px-4 mb-4 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-1.5">
-            <Text className="text-lg font-bold text-red-950 tracking-tight">
+          <View className="flex-row items-center gap-2">
+            {/* <View className="bg-rose-200/60 p-1.5 rounded-full">
+              <Clock size={16} color="#e11d48" strokeWidth={2.5} />
+            </View> */}
+            <Text className="text-xl font-black text-rose-950 tracking-tight">
               {title}
             </Text>
-            <Clock size={16} color="#b91c1c" />
           </View>
 
           {/* Timer UI */}
-          <View className="flex-row items-center gap-1">
-            <View className="bg-red-600 px-1.5 py-1 rounded-md min-w-[24px] items-center">
-              <Text className="text-[11px] font-bold text-white leading-none">{timeLeft.h}</Text>
+          <View className="flex-row items-center gap-1 bg-white px-2 py-1.5 rounded-xl border border-rose-100 shadow-sm">
+            <View className="bg-rose-600 w-6 h-6 rounded-md items-center justify-center shadow-sm">
+              <Text className="text-[11px] font-black text-white leading-none">
+                {timeLeft.h}
+              </Text>
             </View>
-            <Text className="text-red-800 font-bold leading-none">:</Text>
-            <View className="bg-red-600 px-1.5 py-1 rounded-md min-w-[24px] items-center">
-              <Text className="text-[11px] font-bold text-white leading-none">{timeLeft.m}</Text>
+            <Text className="text-rose-400 font-bold leading-none mb-0.5">
+              :
+            </Text>
+            <View className="bg-rose-600 w-6 h-6 rounded-md items-center justify-center shadow-sm">
+              <Text className="text-[11px] font-black text-white leading-none">
+                {timeLeft.m}
+              </Text>
             </View>
-            <Text className="text-red-800 font-bold leading-none">:</Text>
-            <View className="bg-red-600 px-1.5 py-1 rounded-md min-w-[24px] items-center">
-              <Text className="text-[11px] font-bold text-white leading-none">{timeLeft.s}</Text>
+            <Text className="text-rose-400 font-bold leading-none mb-0.5">
+              :
+            </Text>
+            <View className="bg-rose-600 w-6 h-6 rounded-md items-center justify-center shadow-sm">
+              <Text className="text-[11px] font-black text-white leading-none">
+                {timeLeft.s}
+              </Text>
             </View>
           </View>
         </View>

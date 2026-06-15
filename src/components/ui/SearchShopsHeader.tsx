@@ -3,7 +3,7 @@ import SearchBar from "@/src/components/ui/SearchBar";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { LayoutChangeEvent, Pressable, View, Text } from "react-native";
+import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
 import Animated, {
   interpolate,
   SharedValue,
@@ -48,12 +48,15 @@ const SearchShopsHeader = ({ progress, title }: Props) => {
 
   // Clip the top row height to 0 when collapsed
   const topRowClipStyle = useAnimatedStyle(() => {
-    if (measuredHeight === 0) return { overflow: "hidden" };
-    return {
-      height: interpolate(progress.value, [0, 1], [measuredHeight, 0]),
-      marginBottom: interpolate(progress.value, [0, 1], [16, 0]),
+    const baseStyle = {
+      marginBottom: interpolate(progress.value, [0, 1], [6, 0]),
       opacity: interpolate(progress.value, [0, 1], [1, 0]),
-      overflow: "hidden",
+      overflow: "hidden" as const,
+    };
+    if (measuredHeight === 0) return baseStyle;
+    return {
+      ...baseStyle,
+      height: interpolate(progress.value, [0, 1], [measuredHeight, 0]),
     };
   }, [measuredHeight]);
 
@@ -70,7 +73,7 @@ const SearchShopsHeader = ({ progress, title }: Props) => {
   });
 
   return (
-    <View className="px-4 pb-4 pt-3 relative">
+    <View className="px-4 pb-4 pt-2 relative">
       {/* Absolute Back Button, always visible at top-left */}
       <Animated.View
         style={backButtonAnimation}
@@ -142,9 +145,14 @@ const SearchShopsHeader = ({ progress, title }: Props) => {
       </Animated.View>
 
       {/* Search Bar */}
-      <Animated.View style={searchBarAnimation}>
-        <SearchBar placeholderText="Search for shops or items" />
-      </Animated.View>
+      <Pressable onPress={() => router.push("/(app)/main-search")}>
+        <Animated.View style={searchBarAnimation} pointerEvents="none">
+          <SearchBar
+            placeholderText="Search for shops or items"
+            editable={false}
+          />
+        </Animated.View>
+      </Pressable>
     </View>
   );
 };

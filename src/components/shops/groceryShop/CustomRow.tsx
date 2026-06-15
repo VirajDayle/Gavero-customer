@@ -78,10 +78,21 @@ export const CustomRow = React.memo(
     return (
       <View className="py-3">
         {/* Header Title Section */}
-        <View className="px-4 mb-3">
-          <Text className="text-lg font-bold text-gray-900 tracking-tight">
+        <View className="px-4 mb-3 flex-row items-center justify-between">
+          <Text className="text-xl font-black text-gray-900 tracking-tight">
             {title}
           </Text>
+          {onSeeAllPress && products.length > 0 && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onSeeAllPress}
+              className="bg-gray-100 px-3 py-1 rounded-full border border-gray-200"
+            >
+              <Text className="text-xs font-semibold text-gray-700">
+                See All
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Optimized Horizontal List */}
@@ -97,20 +108,7 @@ export const CustomRow = React.memo(
           contentContainerStyle={listContainerStyle}
         />
 
-        {/* Production-grade 'See All' Bottom Trigger */}
-        {onSeeAllPress && products.length > 0 && (
-          <View className="px-4 mt-4">
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={onSeeAllPress}
-              className="w-full py-2.5 bg-gray-50 rounded-xl border border-gray-100 flex-row items-center justify-center"
-            >
-              <Text className="text-xs font-semibold text-orange-600 tracking-wide">
-                See All Items
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        {/* Bottom space padding if needed */}
       </View>
     );
   },

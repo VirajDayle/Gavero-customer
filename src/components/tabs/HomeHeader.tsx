@@ -54,11 +54,14 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
 
   // Clip the top row height to 0 when collapsed
   const clipStyle = useAnimatedStyle(() => {
-    if (measuredHeight === 0) return { overflow: "hidden" };
-    return {
-      height: interpolate(scrollProgress.value, [0, 1], [measuredHeight, 0]),
+    const baseStyle = {
       marginBottom: interpolate(scrollProgress.value, [0, 1], [8, 0]),
-      overflow: "hidden",
+      overflow: "hidden" as const,
+    };
+    if (measuredHeight === 0) return baseStyle;
+    return {
+      ...baseStyle,
+      height: interpolate(scrollProgress.value, [0, 1], [measuredHeight, 0]),
     };
   }, [measuredHeight]);
 
@@ -91,7 +94,7 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
     //   end={{ x: 0.5, y: 1 }}
     //   className="w-full"
     // >
-    <View className={clsx(className, "px-4 pt-3 pb-1 ")}>
+    <View className={clsx(className, "px-4 pb-1 pt-2")}>
       {/* ── Collapsible top row (address + action icons) ── */}
       <Animated.View style={clipStyle}>
         <View
@@ -125,14 +128,17 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
               className="relative h-12 w-12 items-center justify-center"
               onPress={() => router.push("/(app)/(auth)/message-box")}
             >
-              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+              <View className="h-10 w-10 items-center justify-center rounded-full">
                 <Ionicons
                   name="notifications-outline"
                   size={22}
                   color="#111827"
                 />
               </View>
-              <View className="absolute top-1 right-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 border-2 border-white">
+              <View
+                className="absolute top-1 right-1 h-5 w-5 items-center justify-center bg-red-500"
+                style={{ borderRadius: 10 }}
+              >
                 <Text className="text-[10px] font-bold text-white mt-0.5">
                   4
                 </Text>
@@ -142,10 +148,13 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
               className="relative h-12 w-12 items-center justify-center"
               onPress={() => router.push("/(app)/(auth)/cart")}
             >
-              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+              <View className="h-10 w-10 items-center justify-center rounded-full">
                 <Ionicons name="cart-outline" size={22} color="#111827" />
               </View>
-              <View className="absolute top-1 right-1 h-5 w-5 items-center justify-center rounded-full bg-red-500 border-2 border-white">
+              <View
+                className="absolute top-1 right-1 h-5 w-5 items-center justify-center bg-red-500"
+                style={{ borderRadius: 10 }}
+              >
                 <Text className="text-[10px] font-bold text-white mt-0.5">
                   5
                 </Text>
@@ -166,18 +175,29 @@ const HomeHeader = ({ className, scrollProgress }: HomeHeaderProps) => {
 
       {/* ── Always visible: SearchBar + ShopCategories ── */}
       <View style={{ gap: 8 }}>
-        <SearchBar
-          placeholderAnimation={{
-            textList: [
-              "Panchwati Restaurant",
-              "Khandelwal Bakery",
-              "Paratha Junction",
-              "Jayanti Cafe",
-            ],
-            delay: 2000,
-          }}
-          editable={false}
-        />
+        <Pressable
+          onPress={() =>
+            router.push({
+              pathname: "/(app)/main-search",
+              params: { context: "Grocery" },
+            })
+          }
+        >
+          <View pointerEvents="none">
+            <SearchBar
+              placeholderAnimation={{
+                textList: [
+                  "Panchwati Restaurant",
+                  "Khandelwal Bakery",
+                  "Paratha Junction",
+                  "Jayanti Cafe",
+                ],
+                delay: 2000,
+              }}
+              editable={false}
+            />
+          </View>
+        </Pressable>
         <ShopCategories items={SHOP_CATEGORIES} />
       </View>
     </View>

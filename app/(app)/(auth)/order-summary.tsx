@@ -11,6 +11,7 @@ import * as Sharing from "expo-sharing";
 import { styled } from "nativewind";
 import React, { useCallback, useRef, useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { ShoppingBasket, UtensilsCrossed } from "lucide-react-native";
 import LinearGradient from "react-native-linear-gradient";
 import {
   SafeAreaView as RNSafeAreaView,
@@ -22,8 +23,8 @@ const SafeAreaView = styled(RNSafeAreaView);
 // Dummy Data matching previous screens
 const ORDER_CATEGORIES = [
   {
-    title: "Grocery & Essentials",
-    icon: require("@/src/assets/images/shopCategeory/groceryActive.png"),
+    title: "Grocery",
+    color: "#016630",
     items: [
       {
         name: "Tata Tea Premium | Desh Ki Chai | Unique Blend Crafted For Chai Lovers Across India | Black Tea | 1.5kg",
@@ -41,8 +42,8 @@ const ORDER_CATEGORIES = [
     ],
   },
   {
-    title: "Food & Restaurant",
-    icon: require("@/src/assets/images/shopCategeory/restaurant.png"),
+    title: "Food",
+    color: "#000000",
     items: [
       {
         name: "Veg Hakka Noodles - Full",
@@ -298,28 +299,27 @@ const OrderSummary = () => {
           <View className="flex-row mx-3 mt-4 mb-2 gap-3 justify-start">
             {ORDER_CATEGORIES.map((category, index) => {
               const isActive = activeCategory === category.title;
-              const isRestaurant = category.title === "Food & Restaurant";
-
-              let activeBg = "bg-[#B7ECCD]";
-              if (isRestaurant) {
-                activeBg = "bg-black";
-              }
+              const isFood = category.title === "Food";
 
               return (
                 <Pressable
                   key={index}
                   onPress={() => setActiveCategory(category.title)}
-                  className={`h-17 w-17 p-2 border rounded-xl items-center justify-center ${
+                  className={`h-18 w-18 pt-2 pb-1.5 rounded-2xl items-center justify-center ${
                     isActive
-                      ? "border-gray-400 " + activeBg
-                      : "border-gray-300 bg-white"
+                      ? "border border-[#C0C0C0]"
+                      : "border border-gray-300 bg-white"
                   }`}
+                  style={{ backgroundColor: isActive ? category.color : "white" }}
                 >
-                  <Image
-                    source={category.icon}
-                    className="h-10 w-10"
-                    resizeMode="contain"
-                  />
+                  {isFood ? (
+                    <UtensilsCrossed size={28} color={isActive ? "#FFFFFF" : "#000000"} strokeWidth={2} />
+                  ) : (
+                    <ShoppingBasket size={28} color={isActive ? "#FFFFFF" : "#000000"} strokeWidth={2} />
+                  )}
+                  <Text className={`text-[10px] font-medium mt-1 ${isActive ? "text-white" : "text-black"}`}>
+                    {category.title}
+                  </Text>
                 </Pressable>
               );
             })}
@@ -327,7 +327,9 @@ const OrderSummary = () => {
 
           {/* Active Category Items */}
           <View className="mx-3 mt-4 pb-3 mb-2 gap-1.5">
-            {ORDER_CATEGORIES.find((c) => c.title === activeCategory)?.items.map((item, index) => (
+            {ORDER_CATEGORIES.find(
+              (c) => c.title === activeCategory,
+            )?.items.map((item, index) => (
               <View key={index}>
                 <View className="flex-row justify-between items-start py-2">
                   {/* Left Section: Image and Name */}

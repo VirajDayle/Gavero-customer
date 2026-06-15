@@ -29,8 +29,11 @@ const CouponCode = ({ coupons, onOpenSheet }: CouponCodeProps) => {
         width={width}
         height={85}
         data={coupons}
+        onConfigurePanGesture={(gesture) => {
+          gesture.activeOffsetX([-10, 10]);
+        }}
         // 1. Remove onSnapToItem completely
-        // onSnapToItem={(index) => setActiveIndex(index)} 
+        // onSnapToItem={(index) => setActiveIndex(index)}
 
         // 2. Add onProgressChange for instant tracking
         onProgressChange={(_, absoluteProgress) => {
@@ -38,7 +41,11 @@ const CouponCode = ({ coupons, onOpenSheet }: CouponCodeProps) => {
           const currentIdx = Math.round(absoluteProgress);
 
           // Safety check to avoid index out-of-bounds loops
-          if (currentIdx >= 0 && currentIdx < coupons.length && currentIdx !== activeIndex) {
+          if (
+            currentIdx >= 0 &&
+            currentIdx < coupons.length &&
+            currentIdx !== activeIndex
+          ) {
             setActiveIndex(currentIdx);
           }
         }}

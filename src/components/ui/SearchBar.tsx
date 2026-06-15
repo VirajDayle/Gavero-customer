@@ -33,6 +33,12 @@ export interface SearchBarProps {
   editable?: boolean;
   /** Forwarded ref for programmatic focus/blur from parent */
   inputRef?: React.RefObject<TextInput | null>;
+  /** Auto-focus the input on mount */
+  autoFocus?: boolean;
+  /** Whether to show a back arrow instead of search icon */
+  showBackArrow?: boolean;
+  /** Callback for when the back arrow is pressed */
+  onBackPress?: () => void;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -53,6 +59,9 @@ const SearchBar = ({
   onBlur,
   onClear,
   inputRef: externalInputRef,
+  autoFocus,
+  showBackArrow,
+  onBackPress,
 }: SearchBarProps) => {
   // Support both controlled and uncontrolled usage
   const isControlled = value !== undefined;
@@ -161,7 +170,17 @@ const SearchBar = ({
         style,
       ]}
     >
-      <Ionicons name="search" size={22} color="#374151" />
+      {showBackArrow ? (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onBackPress}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="arrow-back" size={22} color="#374151" />
+        </TouchableOpacity>
+      ) : (
+        <Ionicons name="search" size={22} color="#374151" />
+      )}
 
       <View style={{ flex: 1 }}>
         {showAnimatedPlaceholder && (
@@ -198,6 +217,7 @@ const SearchBar = ({
           onFocus={onFocus}
           onBlur={onBlur} // ← was missing the passthrough
           editable={editable}
+          autoFocus={autoFocus}
           placeholder={placeholderText ?? ""}
           placeholderTextColor="#9CA3AF"
           returnKeyType="search"

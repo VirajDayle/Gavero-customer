@@ -6,20 +6,22 @@ import type { ShopCategoryItem } from "@/src/types/category";
  */
 export const SHOP_CATEGORIES: ShopCategoryItem[] = [
   {
+    id: "3",
+    iconActive: require("@/src/assets/images/shopCategeory/restaurant.png"),
+    icon: require("@/src/assets/images/shopCategeory/grocery.png"),
+    title: "Food",
+    color: "#000000", // Tomato Red - perfect for food cravings
+    textColor: "#FFFFFF",
+    isActive: true,
+  },
+  {
     id: "1",
     iconActive: require("@/src/assets/images/shopCategeory/groceryActive.png"),
     icon: require("@/src/assets/images/shopCategeory/grocery.png"),
     title: "Grocery",
-    color: "#B7ECCD",
-    textColor: "#111827",
-  },
-  {
-    id: "3",
-    iconActive: require("@/src/assets/images/shopCategeory/restaurant.png"),
-    icon: require("@/src/assets/images/shopCategeory/grocery.png"),
-    title: "Restaurant",
-    color: "#000000", // Tomato Red - perfect for food cravings
+    color: "#016630",
     textColor: "#FFFFFF",
+    isActive: true,
   },
   {
     id: "4",

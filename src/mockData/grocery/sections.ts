@@ -23,7 +23,6 @@ export const GROCERY_SECTIONS: GrocerySectionItem[] = [
     title: "Top Deals 🔥",
     data: SUPERMARKET_PRODUCTS.slice(0, 10),
   },
-
   {
     id: "flash-sale-1",
     type: "flashSale",
@@ -54,8 +53,10 @@ export const GROCERY_SECTIONS: GrocerySectionItem[] = [
   {
     id: "3",
     type: "goToSection",
-    title: "Go To Snacks",
+    title: "Go To Poha",
     data: SUPERMARKET_PRODUCTS.slice(10, 16),
+    targetCategoryId: "10",
+    targetSubCategoryId: "10-10",
   },
   {
     id: "4",

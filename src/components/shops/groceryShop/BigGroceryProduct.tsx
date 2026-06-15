@@ -13,7 +13,14 @@ import { router } from "expo-router";
 import { Bookmark, FileText, Info, Share, Store } from "lucide-react-native";
 import { styled } from "nativewind";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Dimensions, Image, Pressable, Text, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  Share as RNShare,
+  Text,
+  View,
+} from "react-native";
 import { ScrollView as GHScrollView } from "react-native-gesture-handler";
 import Animated, {
   SharedValue,
@@ -168,8 +175,18 @@ const BigGroceryProduct: React.FC<BigGroceryProductProps> = ({
         >
           <Ionicons name="arrow-back" size={22} color="#1a1a1a" />
         </Pressable>
-
-        <SearchBar className="flex-1 ml-2" placeholderText="Search Product" />
+        <Pressable
+          className="flex-1 ml-2"
+          onPress={() => {
+            router.push("/(app)/main-search");
+          }}
+        >
+          <SearchBar
+            className="w-full"
+            placeholderText="Search Product"
+            editable={false}
+          />
+        </Pressable>
       </Animated.View>
       <Animated.ScrollView
         className="flex-1"
@@ -219,6 +236,16 @@ const BigGroceryProduct: React.FC<BigGroceryProductProps> = ({
                 shadowRadius: 2,
                 elevation: 2,
               }}
+              onPress={async () => {
+                try {
+                  await RNShare.share({
+                    message: `Check out ${title} on Gavero!\n\nPrice: ${currentPrice}\n\nOrder now on Gavero app!`,
+                    title: "Share Product",
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
             >
               <Share size={18} color="#374151" />
             </Pressable>
@@ -245,6 +272,9 @@ const BigGroceryProduct: React.FC<BigGroceryProductProps> = ({
                 autoPlay={false}
                 data={images}
                 scrollAnimationDuration={500}
+                onConfigurePanGesture={(gesture) => {
+                  gesture.activeOffsetX([-10, 10]);
+                }}
                 onSnapToItem={(index) => setActiveIndex(index)}
                 renderItem={({ item, index }) => (
                   <Pressable

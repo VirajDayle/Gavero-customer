@@ -48,6 +48,7 @@ const SearchShops = () => {
       return <GrocerySearch />;
 
     case "Restaurant":
+    case "Food":
       return <RestaurantSearch />;
 
     default:

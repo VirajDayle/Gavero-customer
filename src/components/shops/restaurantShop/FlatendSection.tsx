@@ -14,11 +14,8 @@ type FlatendSectionProps = {
 const FlatendSection = ({ item, onItemPress }: FlatendSectionProps) => {
   return (
     <View>
-      <View className="flex-row justify-between items-center bg-white py-2.5">
-        <View className="flex-row">
-          <Text className="text-lg font-medium ml-3">{item.name}</Text>
-          {/* <Text className="text-lg font-medium ml-2">{item.data.length}</Text> */}
-        </View>
+      <View className="px-4 py-4 border-b border-gray-100 bg-white flex-row items-center justify-between">
+        <Text className="text-xl font-black text-gray-900 tracking-tight">{item.name}</Text>
       </View>
 
       <View className="mx-2">

@@ -4,11 +4,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "1",
     title: "Fresh Fruits & Vegetables",
-    source: require("@/src/assets/images/groceryShop/cleanImages/fruitsave.png"),
+    source: "https://m.media-amazon.com/images/I/51ebZJ+DR4L._SL1500_.jpg",
     subSections: [
       {
         id: "1-1",
         title: "Fresh Fruits",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/freshFruitClean.png"),
         products: [
           {
             id: "1-1-1",
@@ -150,6 +151,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-2",
         title: "Fresh Vegetables",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/freshVegetablesClean.png"),
         products: [
           {
             id: "1-2-1",
@@ -291,6 +293,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-3",
         title: "Leafy Greens & Herbs",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/LeafyGreenClean.png"),
         products: [
           {
             id: "1-3-1",
@@ -432,6 +435,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-4",
         title: "Exotic Fruits & Veggies",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/exoticsClean.png"),
         products: [
           {
             id: "1-4-1",
@@ -573,6 +577,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-5",
         title: "Organic Produce",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/organicCleab.png"),
         products: [
           {
             id: "1-5-1",
@@ -714,6 +719,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-6",
         title: "Cut & Packed Veggies",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/freshlyCutClean.png"),
         products: [
           {
             id: "1-6-1",
@@ -855,6 +861,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-7",
         title: "Salads & Sprouts",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/freshVegetablesClean.png"),
         products: [
           {
             id: "1-7-1",
@@ -996,6 +1003,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "1-8",
         title: "Seasonal Specials",
+        image: require("@/src/assets/images/groceryShop/fruitsAndegetables/seasonalClean.png"),
         products: [
           {
             id: "1-8-1",
@@ -1139,11 +1147,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "2",
     title: "Dairy & Breakfast",
-    source: require("@/src/assets/images/groceryShop/cleanImages/dairyandb.png"),
+    source: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
     subSections: [
       {
         id: "2-1",
         title: "Milk",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-1-1",
@@ -1285,6 +1294,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-2",
         title: "Curd & Yogurt",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-2-1",
@@ -1426,6 +1436,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-3",
         title: "Paneer & Tofu",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-3-1",
@@ -1567,6 +1578,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-4",
         title: "Cheese & Butter",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-4-1",
@@ -1708,6 +1720,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-5",
         title: "Eggs",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-5-1",
@@ -1849,6 +1862,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-6",
         title: "Bread & Bakery",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-6-1",
@@ -1990,6 +2004,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-7",
         title: "Cereals & Oats",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-7-1",
@@ -2131,6 +2146,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-8",
         title: "Spreads & Honey",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-8-1",
@@ -2272,6 +2288,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "2-9",
         title: "Instant Breakfast",
+        image: "https://m.media-amazon.com/images/I/51aF5raZQQL._SL1000_.jpg",
         products: [
           {
             id: "2-9-1",
@@ -2415,11 +2432,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "3",
     title: "Atta, Rice & Grains",
-    source: require("@/src/assets/images/groceryShop/cleanImages/grainsastaple.png"),
+    source: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
     subSections: [
       {
         id: "3-1",
         title: "Atta",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-1-1",
@@ -2561,6 +2579,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "3-2",
         title: "Rice",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-2-1",
@@ -2702,6 +2721,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "3-3",
         title: "Millets",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-3-1",
@@ -2843,6 +2863,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "3-4",
         title: "Suji",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-4-1",
@@ -2984,6 +3005,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "3-5",
         title: "Poha",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-5-1",
@@ -3125,6 +3147,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "3-6",
         title: "Daliya",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-6-1",
@@ -3266,6 +3289,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "3-7",
         title: "Vermicelli",
+        image: "https://m.media-amazon.com/images/I/71oCbaHH1pL._SL1500_.jpg",
         products: [
           {
             id: "3-7-1",
@@ -3409,11 +3433,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "4",
     title: "Dal, Pulses & Dry Staples",
-    source: require("@/src/assets/images/groceryShop/cleanImages/dalad.png"),
+    source: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
     subSections: [
       {
         id: "4-1",
         title: "Dal",
+        image: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
         products: [
           {
             id: "4-1-1",
@@ -3555,6 +3580,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "4-2",
         title: "Rajma & Chole",
+        image: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
         products: [
           {
             id: "4-2-1",
@@ -3696,6 +3722,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "4-3",
         title: "Dry Peas & Beans",
+        image: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
         products: [
           {
             id: "4-3-1",
@@ -3837,6 +3864,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "4-4",
         title: "Soya Products",
+        image: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
         products: [
           {
             id: "4-4-1",
@@ -3978,6 +4006,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "4-5",
         title: "Sabudana",
+        image: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
         products: [
           {
             id: "4-5-1",
@@ -4119,6 +4148,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "4-6",
         title: "Cooking Staples",
+        image: "https://m.media-amazon.com/images/I/71gHkQemhrL._SL1200_.jpg",
         products: [
           {
             id: "4-6-1",
@@ -4262,11 +4292,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "5",
     title: "Snacks & Biscuits",
-    source: require("@/src/assets/images/groceryShop/cleanImages/snacksab.png"),
+    source: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
     subSections: [
       {
         id: "5-1",
         title: "Chips & Namkeen",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-1-1",
@@ -4408,6 +4439,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-2",
         title: "Bhujia & Mixtures",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-2-1",
@@ -4549,6 +4581,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-3",
         title: "Biscuits & Cookies",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-3-1",
@@ -4690,6 +4723,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-4",
         title: "Chocolates & Candies",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-4-1",
@@ -4831,6 +4865,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-5",
         title: "Cakes & Wafers",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-5-1",
@@ -4972,6 +5007,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-6",
         title: "Instant Noodles",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-6-1",
@@ -5113,6 +5149,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-7",
         title: "Pasta & Macaroni",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-7-1",
@@ -5254,6 +5291,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-8",
         title: "Soups",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-8-1",
@@ -5395,6 +5433,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-9",
         title: "Ready-to-Eat Meals",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-9-1",
@@ -5536,6 +5575,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-10",
         title: "Instant Mixes",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-10-1",
@@ -5677,6 +5717,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-11",
         title: "Protein & Healthy Snacks",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-11-1",
@@ -5822,6 +5863,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "5-12",
         title: "Kids Snacks",
+        image: "https://m.media-amazon.com/images/I/71sOPzrW0mL._SL1500_.jpg",
         products: [
           {
             id: "5-12-1",
@@ -5970,11 +6012,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "6",
     title: "Icecream & Frozen",
-    source: require("@/src/assets/images/groceryShop/cleanImages/frozenai.png"),
+    source: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
     subSections: [
       {
         id: "6-1",
         title: "Ice Cream Tubs",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-1-1",
@@ -6116,6 +6159,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-2",
         title: "Ice Cream Sticks & Cones",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-2-1",
@@ -6257,6 +6301,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-3",
         title: "Kulfi & Indian Desserts",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-3-1",
@@ -6401,6 +6446,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-4",
         title: "Frozen Snacks",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-4-1",
@@ -6555,6 +6601,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-5",
         title: "Frozen Veggies",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-5-1",
@@ -6702,6 +6749,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-6",
         title: "Frozen Paratha & Roti",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-6-1",
@@ -6857,6 +6905,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-7",
         title: "Frozen Ready Meals",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-7-1",
@@ -7013,6 +7062,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "6-8",
         title: "Frozen Desserts",
+        image: "https://m.media-amazon.com/images/I/510YPqnd2bL._SL1000_.jpg",
         products: [
           {
             id: "6-8-1",
@@ -7171,11 +7221,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "7",
     title: "Spices & Masala",
-    source: require("@/src/assets/images/groceryShop/cleanImages/spiceaherb.png"),
+    source: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
     subSections: [
       {
         id: "7-1",
         title: "Whole Spices",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-1-1",
@@ -7317,6 +7368,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-2",
         title: "Powder Spices",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-2-1",
@@ -7458,6 +7510,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-3",
         title: "Blended Masalas",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-3-1",
@@ -7599,6 +7652,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-4",
         title: "Premium Masalas",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-4-1",
@@ -7740,6 +7794,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-5",
         title: "Dry Fruits",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-5-1",
@@ -7882,6 +7937,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-6",
         title: "Nuts & Seeds",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-6-1",
@@ -8034,6 +8090,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-7",
         title: "Dates & Raisins",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-7-1",
@@ -8185,6 +8242,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-8",
         title: "Mukhwas & Saunf",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-8-1",
@@ -8337,6 +8395,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-9",
         title: "Ayurvedic Spices",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-9-1",
@@ -8492,6 +8551,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "7-10",
         title: "International Seasonings",
+        image: "https://m.media-amazon.com/images/I/81PqVakmwPL._SL1500_.jpg",
         products: [
           {
             id: "7-10-1",
@@ -8647,12 +8707,13 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   },
   {
     id: "8",
-    title: "Oil, Ghee & Cooking Essentials",
-    source: require("@/src/assets/images/groceryShop/cleanImages/oilsag.png"),
+    title: "Oil, Ghee & Essentials",
+    source: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
     subSections: [
       {
         id: "8-1",
         title: "Cooking Oils",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-1-1",
@@ -8794,6 +8855,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-2",
         title: "Ghee",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-2-1",
@@ -8935,6 +8997,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-3",
         title: "Olive & Specialty Oils",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-3-1",
@@ -9078,6 +9141,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-4",
         title: "Salt & Sugar",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-4-1",
@@ -9219,6 +9283,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-5",
         title: "Jaggery & Sweeteners",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-5-1",
@@ -9363,6 +9428,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-6",
         title: "Vinegar & Sauces",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-6-1",
@@ -9516,6 +9582,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-7",
         title: "Ketchup & Spreads",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-7-1",
@@ -9668,6 +9735,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-8",
         title: "Baking Essentials",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-8-1",
@@ -9824,6 +9892,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-9",
         title: "Cooking Pastes",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-9-1",
@@ -9980,6 +10049,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-10",
         title: "Pickles & Chutneys",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-10-1",
@@ -10136,6 +10206,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-11",
         title: "Papad",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-11-1",
@@ -10292,6 +10363,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "8-12",
         title: "Ready-to-Cook Essentials",
+        image: "https://m.media-amazon.com/images/I/61IW6nOHEkL._SL1100_.jpg",
         products: [
           {
             id: "8-12-1",
@@ -10450,11 +10522,12 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   {
     id: "9",
     title: "Tea, Coffee & Beverages",
-    source: require("@/src/assets/images/groceryShop/cleanImages/bewerage.png"),
+    source: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
     subSections: [
       {
         id: "9-1",
         title: "Tea",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-1-1",
@@ -10604,6 +10677,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-2",
         title: "Coffee",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-2-1",
@@ -10760,6 +10834,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-3",
         title: "Green & Herbal Tea",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-3-1",
@@ -10916,6 +10991,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-4",
         title: "Health Drinks",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-4-1",
@@ -11072,6 +11148,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-5",
         title: "Soft Drinks",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-5-1",
@@ -11228,6 +11305,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-6",
         title: "Juices",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-6-1",
@@ -11384,6 +11462,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-7",
         title: "Energy Drinks",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-7-1",
@@ -11539,6 +11618,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "9-8",
         title: "Water & Soda",
+        image: "https://m.media-amazon.com/images/I/61y4HOllrdL._SL1500_.jpg",
         products: [
           {
             id: "9-8-1",
@@ -11696,12 +11776,13 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
   },
   {
     id: "10",
-    title: "Home & Personal Care",
-    source: require("@/src/assets/images/groceryShop/cleanImages/houseapersonal.png"),
+    title: "Home & Self Care",
+    source: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
     subSections: [
       {
         id: "10-1",
         title: "Detergents",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-1-1",
@@ -11857,6 +11938,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-2",
         title: "Dishwash",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-2-1",
@@ -12011,6 +12093,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-3",
         title: "Floor Cleaners",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-3-1",
@@ -12167,6 +12250,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-4",
         title: "Bathroom Cleaners",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-4-1",
@@ -12323,6 +12407,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-5",
         title: "Bath & Body",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-5-1",
@@ -12479,6 +12564,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-6",
         title: "Hair Care",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-6-1",
@@ -12635,6 +12721,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-7",
         title: "Oral Care",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-7-1",
@@ -12791,6 +12878,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-8",
         title: "Skin Care",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-8-1",
@@ -12946,6 +13034,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-9",
         title: "Feminine Hygiene",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-9-1",
@@ -13101,6 +13190,7 @@ export const GROCERY_CATEGORIES: CategoryProp[] = [
       {
         id: "10-10",
         title: "Baby Care",
+        image: "https://m.media-amazon.com/images/I/71hSVcOSZUL._SL1500_.jpg",
         products: [
           {
             id: "10-10-1",

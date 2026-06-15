@@ -10,4 +10,6 @@ export type ShopCategoryItem = {
   color?: string;
   /** Optional text color used for active chip text */
   textColor?: string;
+  /** True if the category is currently available */
+  isActive?: boolean;
 };

@@ -1,5 +1,12 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Share as RNShare,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AddCart from "../groceryShop/AddCart";
 
 // Assuming these types are imported from your types file
@@ -12,6 +19,7 @@ interface FoodItemCardProps {
   onPress?: (item: Item) => void;
   onAddPress?: (item: Item) => void;
   hideAddButton?: boolean;
+  hideBorder?: boolean;
 }
 
 export const FoodItemCard: React.FC<FoodItemCardProps> = ({
@@ -19,6 +27,7 @@ export const FoodItemCard: React.FC<FoodItemCardProps> = ({
   onPress,
   onAddPress,
   hideAddButton,
+  hideBorder,
 }) => {
   const {
     name,
@@ -36,7 +45,7 @@ export const FoodItemCard: React.FC<FoodItemCardProps> = ({
       activeOpacity={0.7}
       onPress={() => onPress?.(item)}
       disabled={!isAvailable}
-      className={`flex-row justify-between py-4 pr-4 mx-2.5 bg-white border-b border-gray-100 ${!isAvailable ? "opacity-60" : ""}`}
+      className={`flex-row justify-between py-4 px-4 bg-white ${hideBorder ? "" : "border-b border-gray-100"} ${!isAvailable ? "opacity-60" : ""}`}
     >
       {/* Left Column: Details */}
       <View className="flex-1 pr-4 justify-between">
@@ -93,9 +102,16 @@ export const FoodItemCard: React.FC<FoodItemCardProps> = ({
             <TouchableOpacity
               activeOpacity={0.7}
               className="p-1"
-              onPress={(e) => {
+              onPress={async (e) => {
                 e.stopPropagation();
-                // Add share logic here
+                try {
+                  await RNShare.share({
+                    message: `Check out ${name} on Gavero!\n\nPrice: ${currency}${price}\n\nOrder now on Gavero app!`,
+                    title: "Share Food",
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
               }}
             >
               <Share size={15} color="#4B5563" strokeWidth={2.2} />
