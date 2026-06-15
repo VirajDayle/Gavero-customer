@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.viraj29.customer",
+      "config": {
+        "googleMapsApiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,8 +22,15 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "softwareKeyboardLayoutMode": "pan",
+      "edgeToEdgeEnabled": false,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.viraj29.customer",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc"
+        }
+      }
     },
     "web": {
       "output": "static",
@@ -37,6 +48,36 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "src/assets/fonts/SupermercadoOne-Regular.ttf",
+            "src/assets/fonts/Lato-Bold.ttf",
+            "src/assets/fonts/Roboto-BoldItalic.ttf",
+            "src/assets/fonts/GoogleSans-Regular.ttf"
+          ]
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc",
+          "iosGoogleMapsApiKey": "AIzaSyClGCLd7rlrhiAlL0AUHtT-k6vJqT8A1gc"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Gavero to access your location."
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow Gavero to access your contacts."
         }
       ]
     ],

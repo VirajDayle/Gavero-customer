@@ -1,0 +1,753 @@
+import { ShopType } from "@/src/types";
+import type { Sections } from "@/src/types/grocery";
+import { Ionicons } from "@expo/vector-icons";
+import { FlashList, ViewToken } from "@shopify/flash-list";
+import { router } from "expo-router";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  LayoutAnimation,
+  UIManager,
+  Platform,
+} from "react-native";
+import Animated, {
+  createAnimatedComponent,
+  SharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  FadeIn,
+  FadeOut,
+} from "react-native-reanimated";
+import { useQuery } from "@tanstack/react-query";
+import {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import SearchBar from "../ui/SearchBar";
+import ShopTopSections from "../ui/ShopTopSections";
+
+// Enable LayoutAnimation for Android
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const AnimatedFlashList = createAnimatedComponent(FlashList);
+
+// --- TYPES ---
+export type MenuItem = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  isVeg: boolean;
+  emoji: string;
+};
+
+export type Subsection = {
+  id: string;
+  title: string;
+  items: MenuItem[];
+};
+
+export type MenuSection = {
+  id: string;
+  title: string;
+  items: MenuItem[];
+  subsections: Subsection[];
+};
+
+type FlatRow =
+  | { type: "headerSpacer"; id: string; sectionIndex?: number }
+  | { type: "sticky-header"; id: string; sectionIndex?: number }
+  | { type: "section-header"; id: string; title: string; count: number; sectionIndex: number }
+  | { type: "subsection-toggle"; id: string; title: string; isOpen: boolean; sectionId: string; sectionIndex: number }
+  | { type: "item" | "subsection-item"; id: string; item: MenuItem; sectionIndex: number };
+
+// --- MOCK DATA ---
+const MOCK_DATA: MenuSection[] = [
+  {
+    id: "s1",
+    title: "Starters",
+    items: [
+      { id: "m0", name: "Masala Papad", description: "Roasted papad topped with spices", price: 50, isVeg: true, emoji: "🌮" },
+    ],
+    subsections: [
+      {
+        id: "sub1-1",
+        title: "Tandoor Specials",
+        items: [
+          { id: "m1", name: "Paneer Tikka", description: "Soft paneer cubes marinated in yogurt and spices", price: 250, isVeg: true, emoji: "🍢" },
+          { id: "m2", name: "Chicken Tikka", description: "Juicy chicken chunks roasted to perfection", price: 300, isVeg: false, emoji: "🍗" },
+          { id: "m3", name: "Tandoori Mushroom", description: "Stuffed mushrooms roasted in clay oven", price: 220, isVeg: true, emoji: "🍄" },
+        ],
+      },
+      {
+        id: "sub1-2",
+        title: "Soups",
+        items: [
+          { id: "m4", name: "Tomato Soup", description: "Warm and comforting", price: 150, isVeg: true, emoji: "🍅" },
+          { id: "m5", name: "Chicken Manchow", description: "Spicy and tangy", price: 180, isVeg: false, emoji: "🥣" },
+          { id: "m6", name: "Sweet Corn Soup", description: "Thick soup with sweet corn", price: 140, isVeg: true, emoji: "🍲" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "s2",
+    title: "Main Course",
+    items: [
+      { id: "m7", name: "Dal Makhani", description: "Black lentils cooked overnight", price: 220, isVeg: true, emoji: "🍛" },
+      { id: "m8", name: "Dal Tadka", description: "Yellow lentils with garlic tempering", price: 180, isVeg: true, emoji: "🍲" },
+    ],
+    subsections: [
+      {
+        id: "sub2-1",
+        title: "Paneer Dishes",
+        items: [
+          { id: "m9", name: "Paneer Butter Masala", description: "Rich and creamy", price: 280, isVeg: true, emoji: "🥘" },
+          { id: "m10", name: "Kadai Paneer", description: "Spicy paneer with bell peppers", price: 270, isVeg: true, emoji: "🍛" },
+        ],
+      },
+      {
+        id: "sub2-2",
+        title: "Chicken Curries",
+        items: [
+          { id: "m11", name: "Butter Chicken", description: "Creamy tomato gravy with chicken", price: 320, isVeg: false, emoji: "🍗" },
+          { id: "m12", name: "Chicken Tikka Masala", description: "Spicy and flavorful", price: 310, isVeg: false, emoji: "🍛" },
+        ],
+      }
+    ],
+  },
+  {
+    id: "s3",
+    title: "Biryani",
+    items: [],
+    subsections: [
+      {
+        id: "sub3-1",
+        title: "Veg Biryani",
+        items: [
+          { id: "m13", name: "Subz Biryani", description: "Aromatic basmati rice with veggies", price: 250, isVeg: true, emoji: "🍚" },
+          { id: "m14", name: "Paneer Biryani", description: "Rice cooked with marinated paneer", price: 280, isVeg: true, emoji: "🥘" },
+        ]
+      },
+      {
+        id: "sub3-2",
+        title: "Non-Veg Biryani",
+        items: [
+          { id: "m15", name: "Chicken Biryani", description: "Classic hyderabadi style", price: 350, isVeg: false, emoji: "🍗" },
+          { id: "m16", name: "Mutton Biryani", description: "Slow-cooked mutton with rice", price: 420, isVeg: false, emoji: "🥩" },
+        ]
+      }
+    ],
+  },
+  {
+    id: "s4",
+    title: "Indian Breads",
+    items: [
+      { id: "m17", name: "Tandoori Roti", description: "Whole wheat bread baked in tandoor", price: 40, isVeg: true, emoji: "🫓" },
+      { id: "m18", name: "Butter Naan", description: "Soft bread with butter", price: 60, isVeg: true, emoji: "🥖" },
+      { id: "m19", name: "Garlic Naan", description: "Naan flavored with garlic", price: 75, isVeg: true, emoji: "🧄" },
+      { id: "m20", name: "Lachha Paratha", description: "Multi-layered whole wheat bread", price: 65, isVeg: true, emoji: "🥞" },
+    ],
+    subsections: [],
+  },
+  {
+    id: "s5",
+    title: "Chinese",
+    items: [],
+    subsections: [
+      {
+        id: "sub5-1",
+        title: "Noodles & Rice",
+        items: [
+          { id: "m21", name: "Veg Hakka Noodles", description: "Stir-fried noodles with veggies", price: 180, isVeg: true, emoji: "🍝" },
+          { id: "m22", name: "Chicken Fried Rice", description: "Wok tossed rice with chicken", price: 210, isVeg: false, emoji: "🍚" },
+        ]
+      },
+      {
+        id: "sub5-2",
+        title: "Gravies",
+        items: [
+          { id: "m23", name: "Veg Manchurian", description: "Vegetable dumplings in soy sauce", price: 200, isVeg: true, emoji: "🥘" },
+          { id: "m24", name: "Chilli Chicken", description: "Spicy dry chicken dish", price: 250, isVeg: false, emoji: "🍗" },
+        ]
+      }
+    ],
+  },
+  {
+    id: "s6",
+    title: "Continental",
+    items: [
+      { id: "m25", name: "Penne Arrabiata", description: "Pasta in spicy tomato sauce", price: 280, isVeg: true, emoji: "🍝" },
+      { id: "m26", name: "Alfredo Pasta", description: "Creamy cheese sauce", price: 300, isVeg: true, emoji: "🧀" },
+      { id: "m27", name: "Margherita Pizza", description: "Classic cheese and tomato", price: 350, isVeg: true, emoji: "🍕" },
+    ],
+    subsections: [],
+  },
+  {
+    id: "s7",
+    title: "South Indian",
+    items: [
+      { id: "m28", name: "Plain Dosa", description: "Crispy rice crepe", price: 120, isVeg: true, emoji: "🥞" },
+      { id: "m29", name: "Masala Dosa", description: "Dosa stuffed with potato curry", price: 150, isVeg: true, emoji: "🌮" },
+      { id: "m30", name: "Idli Sambar", description: "Steamed rice cakes with lentil soup", price: 100, isVeg: true, emoji: "🧆" },
+      { id: "m31", name: "Medu Vada", description: "Crispy lentil donuts", price: 110, isVeg: true, emoji: "🍩" },
+    ],
+    subsections: [],
+  },
+  {
+    id: "s8",
+    title: "Desserts",
+    items: [
+      { id: "m32", name: "Gulab Jamun", description: "Deep fried milk balls in syrup", price: 80, isVeg: true, emoji: "🧆" },
+      { id: "m33", name: "Rasmalai", description: "Cottage cheese in sweetened milk", price: 100, isVeg: true, emoji: "🍧" },
+      { id: "m34", name: "Chocolate Brownie", description: "With vanilla ice cream", price: 180, isVeg: true, emoji: "🍰" },
+    ],
+    subsections: [],
+  },
+  {
+    id: "s9",
+    title: "Drinks",
+    items: [
+      { id: "m35", name: "Fresh Lime Soda", description: "Sweet or salted", price: 80, isVeg: true, emoji: "🍋" },
+      { id: "m36", name: "Sweet Lassi", description: "Sweet yogurt drink", price: 100, isVeg: true, emoji: "🥛" },
+      { id: "m37", name: "Cold Coffee", description: "Blended with ice cream", price: 150, isVeg: true, emoji: "🧋" },
+      { id: "m38", name: "Masala Chai", description: "Indian spiced tea", price: 50, isVeg: true, emoji: "☕" },
+    ],
+    subsections: [],
+  },
+  {
+    id: "s10",
+    title: "Accompaniments",
+    items: [
+      { id: "m39", name: "Boondi Raita", description: "Yogurt with gram flour pearls", price: 90, isVeg: true, emoji: "🥣" },
+      { id: "m40", name: "Green Salad", description: "Fresh seasonal vegetables", price: 70, isVeg: true, emoji: "🥗" },
+      { id: "m41", name: "Roasted Papad", description: "Crispy lentil wafer", price: 30, isVeg: true, emoji: "🫓" },
+    ],
+    subsections: [],
+  },
+];
+
+// --- FLAT DATA BUILDER ---
+// Pure function to flatten sections & sub-sections into a simple list
+function buildFlatData(sections: MenuSection[], openSubsections: Set<string>): FlatRow[] {
+  const result: FlatRow[] = [
+    { type: "headerSpacer", id: "header-spacer", sectionIndex: -1 },
+    { type: "sticky-header", id: "sticky-header", sectionIndex: -1 },
+  ];
+
+  sections.forEach((section, sectionIdx) => {
+    let count = section.items.length;
+    section.subsections.forEach((sub) => (count += sub.items.length));
+
+    result.push({
+      type: "section-header",
+      id: `sec-${section.id}`,
+      title: section.title,
+      count,
+      sectionIndex: sectionIdx,
+    });
+
+    section.items.forEach((item) => {
+      result.push({ type: "item", id: `item-${item.id}`, item, sectionIndex: sectionIdx });
+    });
+
+    section.subsections.forEach((sub) => {
+      const isOpen = openSubsections.has(sub.id);
+      result.push({
+        type: "subsection-toggle",
+        id: `sub-${sub.id}`,
+        title: sub.title,
+        isOpen,
+        sectionId: sub.id,
+        sectionIndex: sectionIdx,
+      });
+
+      if (isOpen) {
+        sub.items.forEach((item) => {
+          result.push({ type: "subsection-item", id: `subitem-${item.id}`, item, sectionIndex: sectionIdx });
+        });
+      }
+    });
+  });
+
+  return result;
+}
+
+// --- COMPONENTS ---
+const HeaderSpacerItem = ({
+  style,
+  currentShop,
+  changeShop,
+  onLayout,
+}: {
+  style: any;
+  currentShop: ShopType;
+  changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
+  onLayout?: (e: any) => void;
+}) => (
+  <View onLayout={onLayout}>
+    <Animated.View style={style} />
+    <View className="bg-[#FAFAF7]">
+      <ShopTopSections currentShop={currentShop} changeShop={changeShop} />
+    </View>
+  </View>
+);
+
+const StickyHeaderItem = React.memo(
+  ({
+    scrollY,
+    scrollThresholdSv,
+    sections,
+    activeIndex,
+    onChipPress,
+    chipListRef,
+    onMenuPress,
+  }: {
+    scrollY: SharedValue<number>;
+    scrollThresholdSv: SharedValue<number>;
+    sections: MenuSection[];
+    activeIndex: number;
+    onChipPress: (index: number) => void;
+    chipListRef: React.RefObject<FlashList<any>>;
+    onMenuPress: () => void;
+  }) => {
+    const animatedBackButtonStyle = useAnimatedStyle(() => {
+      const threshold = scrollThresholdSv.value > 0 ? scrollThresholdSv.value - 20 : 200;
+      const isSticky = scrollY.value >= threshold;
+      const opacity = withTiming(isSticky ? 1 : 0);
+      const width = withTiming(isSticky ? 40 : 0);
+      const marginRight = withTiming(isSticky ? 12 : 0);
+      return {
+        opacity,
+        width,
+        marginRight,
+        overflow: "hidden",
+      };
+    });
+
+    return (
+      <View className="bg-white border-b border-gray-200 shadow-sm" style={{ zIndex: 100 }}>
+        <View className="border-t-[0.75] border-[#C0C0C0]" style={{ backgroundColor: "#FF6347" }}>
+          <View className="px-4 flex-row items-center justify-between">
+            <Animated.View style={animatedBackButtonStyle}>
+              <View className="h-10 w-10 items-center justify-center bg-white rounded-full">
+                <Ionicons name="arrow-back" size={20} color="#111827" onPress={() => router.back()} />
+              </View>
+            </Animated.View>
+            <View style={{ flex: 1 }}>
+              <SearchBar className="mt-3 mb-2" placeholderText="search from restaurant" />
+            </View>
+          </View>
+        </View>
+
+        {/* Horizontal Chips List + Menu Button */}
+        <View className="py-2.5 px-2 bg-white border-t border-gray-200 shadow-sm z-10 flex-row items-center" style={{ height: 55 }}>
+          <TouchableOpacity 
+            onPress={onMenuPress}
+            activeOpacity={0.7}
+            className="mr-2 ml-1 p-1.5 bg-gray-50 rounded-lg border border-gray-200"
+          >
+            <Ionicons name="menu" size={22} color="#374151" />
+          </TouchableOpacity>
+          <View className="h-6 w-px bg-gray-200 mr-2" />
+          
+          <View style={{ flex: 1 }}>
+            <FlashList
+              ref={chipListRef as any}
+              data={sections}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              estimatedItemSize={100}
+              keyExtractor={(item) => item.id}
+              extraData={activeIndex}
+              renderItem={({ item, index }) => {
+                const isActive = index === activeIndex;
+                return (
+                  <TouchableOpacity
+                    onPress={() => onChipPress(index)}
+                    className={`mx-1 px-4 py-1.5 rounded-full border ${
+                      isActive ? "bg-[#FF6347] border-[#FF6347]" : "bg-white border-gray-300"
+                    }`}
+                  >
+                    <Text className={`${isActive ? "text-white font-semibold" : "text-gray-700 font-medium"}`}>
+                      {item.title}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  }
+);
+
+const AddToCartButton = () => {
+  const [count, setCount] = useState(0);
+
+  if (count === 0) {
+    return (
+      <TouchableOpacity
+        onPress={() => setCount(1)}
+        className="bg-white border border-[#FF6347] rounded-md px-6 py-1.5 shadow-sm"
+      >
+        <Text className="text-[#FF6347] font-bold text-center">ADD</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <Animated.View
+      entering={FadeIn}
+      exiting={FadeOut}
+      className="flex-row items-center bg-[#FF6347] rounded-md shadow-sm overflow-hidden"
+    >
+      <TouchableOpacity onPress={() => setCount((c) => c - 1)} className="px-3 py-1.5">
+        <Text className="text-white font-bold text-lg leading-5">-</Text>
+      </TouchableOpacity>
+      <Text className="text-white font-bold px-1">{count}</Text>
+      <TouchableOpacity onPress={() => setCount((c) => c + 1)} className="px-3 py-1.5">
+        <Text className="text-white font-bold text-lg leading-5">+</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
+const MenuItemRow = ({ item, isSubsection = false }: { item: MenuItem; isSubsection?: boolean }) => {
+  return (
+    <View className={`flex-row p-4 bg-white border-b border-gray-100 ${isSubsection ? "pl-8 bg-gray-50" : ""}`}>
+      <View className="flex-1 pr-4">
+        <View className="flex-row items-center mb-1">
+          <View className="border border-gray-300 rounded-sm p-0.5 mr-2">
+            <Text style={{ fontSize: 8 }}>{item.isVeg ? "🟢" : "🔴"}</Text>
+          </View>
+          <Text className="font-semibold text-gray-800 text-base">{item.name}</Text>
+        </View>
+        <Text className="text-gray-800 font-medium mb-1">₹{item.price}</Text>
+        <Text className="text-gray-500 text-xs leading-4" numberOfLines={2}>
+          {item.description}
+        </Text>
+      </View>
+      <View className="items-center justify-center">
+        <View className="w-24 h-24 bg-[#FFF5F5] rounded-xl items-center justify-center mb-2">
+          <Text style={{ fontSize: 40 }}>{item.emoji}</Text>
+        </View>
+        <View className="absolute -bottom-1">
+          <AddToCartButton />
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const SubsectionToggleRow = ({ title, isOpen, onToggle }: { title: string; isOpen: boolean; onToggle: () => void }) => {
+  return (
+    <TouchableOpacity
+      onPress={onToggle}
+      activeOpacity={0.7}
+      className="flex-row items-center justify-between p-4 bg-white border-b border-gray-200"
+    >
+      <Text className="font-bold text-gray-800 text-lg">{title}</Text>
+      <Ionicons name={isOpen ? "chevron-up" : "chevron-down"} size={20} color="#4B5563" />
+    </TouchableOpacity>
+  );
+};
+
+const SectionHeaderRow = ({ title, count }: { title: string; count: number }) => {
+  return (
+    <View className="p-4 bg-gray-50 border-b border-gray-200 pt-6">
+      <Text className="font-extrabold text-xl text-gray-900">
+        {title} ({count})
+      </Text>
+    </View>
+  );
+};
+
+interface RestaurantShopProps {
+  sections: Sections; // From parent, unused in mock
+  onScroll: ReturnType<typeof useAnimatedScrollHandler>;
+  headerHeightSv: SharedValue<number>;
+  currentShop: ShopType;
+  changeShop: React.Dispatch<React.SetStateAction<ShopType>>;
+  scrollY: SharedValue<number>;
+}
+
+const RestaurantShop = ({
+  onScroll,
+  headerHeightSv,
+  currentShop,
+  changeShop,
+  scrollY,
+}: RestaurantShopProps) => {
+  const scrollThresholdSv = useSharedValue(200);
+  const flashListRef = useRef<FlashList<FlatRow>>(null);
+  const chipListRef = useRef<FlashList<MenuSection>>(null);
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [openSubsections, setOpenSubsections] = useState<Set<string>>(new Set());
+
+  // Use TanStack Query to fetch mock data
+  const { data: menuData = [] } = useQuery({
+    queryKey: ["restaurantMenu"],
+    queryFn: () => Promise.resolve(MOCK_DATA),
+  });
+
+  const extendedData = useMemo(() => buildFlatData(menuData, openSubsections), [menuData, openSubsections]);
+
+  const headerSpacerStyle = useAnimatedStyle(() => ({
+    height: headerHeightSv.value,
+  }));
+
+  const onChipPress = useCallback(
+    (index: number) => {
+      setActiveIndex(index);
+      try {
+        chipListRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0.5 });
+      } catch (e) {}
+
+      // Find the first header of the target section and scroll there
+      const targetRowIndex = extendedData.findIndex(
+        (row) => row.type === "section-header" && row.sectionIndex === index
+      );
+      if (targetRowIndex !== -1) {
+        flashListRef.current?.scrollToIndex({ index: targetRowIndex, animated: true, viewOffset: 120 });
+      }
+    },
+    [extendedData]
+  );
+
+  const onToggleSubsection = useCallback((sectionId: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setOpenSubsections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
+    });
+  }, []);
+
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 30 }).current;
+
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    // Find the first item that actually belongs to a section
+    const visibleItem = viewableItems.find((v) => v.item.sectionIndex !== undefined && v.item.sectionIndex >= 0);
+    if (visibleItem) {
+      const idx = visibleItem.item.sectionIndex;
+      if (idx !== undefined) {
+        setActiveIndex((prevIdx) => {
+          if (prevIdx !== idx) {
+            try {
+              chipListRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0.5 });
+            } catch (e) {}
+            return idx;
+          }
+          return prevIdx;
+        });
+      }
+    }
+  }).current;
+
+  const openMenu = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.4} />
+    ),
+    []
+  );
+
+  const onMenuSelect = useCallback(
+    (sectionIndex: number, subsectionId?: string) => {
+      closeMenu();
+
+      if (subsectionId) {
+        setOpenSubsections((prev) => {
+          if (!prev.has(subsectionId)) {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            const next = new Set(prev);
+            next.add(subsectionId);
+            return next;
+          }
+          return prev;
+        });
+      }
+
+      setActiveIndex(sectionIndex);
+      try {
+        chipListRef.current?.scrollToIndex({ index: sectionIndex, animated: true, viewPosition: 0.5 });
+      } catch (e) {}
+
+      // Allow state update to propagate
+      setTimeout(() => {
+        // Because of closure, we might not have the newest extendedData, but the headers and sub-headers
+        // toggle rows are ALWAYS physically in the array regardless of subsection open state.
+        const targetRowIndex = extendedData.findIndex((row) => {
+          if (subsectionId) {
+            return row.type === "subsection-toggle" && (row as any).sectionId === subsectionId;
+          } else {
+            return row.type === "section-header" && row.sectionIndex === sectionIndex;
+          }
+        });
+
+        if (targetRowIndex !== -1) {
+          flashListRef.current?.scrollToIndex({ index: targetRowIndex, animated: true, viewOffset: 120 });
+        }
+      }, 100);
+    },
+    [closeMenu, extendedData]
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: FlatRow }) => {
+      if (item.type === "headerSpacer") {
+        return (
+          <HeaderSpacerItem
+            style={headerSpacerStyle}
+            currentShop={currentShop}
+            changeShop={changeShop}
+            onLayout={(e) => {
+              scrollThresholdSv.value = e.nativeEvent.layout.height;
+            }}
+          />
+        );
+      }
+
+      if (item.type === "sticky-header") {
+        return (
+          <StickyHeaderItem
+            scrollY={scrollY}
+            scrollThresholdSv={scrollThresholdSv}
+            sections={menuData}
+            activeIndex={activeIndex}
+            onChipPress={onChipPress}
+            chipListRef={chipListRef}
+            onMenuPress={openMenu}
+          />
+        );
+      }
+
+      if (item.type === "section-header") {
+        return <SectionHeaderRow title={item.title} count={item.count} />;
+      }
+
+      if (item.type === "subsection-toggle") {
+        return (
+          <SubsectionToggleRow
+            title={item.title}
+            isOpen={item.isOpen}
+            onToggle={() => onToggleSubsection(item.sectionId)}
+          />
+        );
+      }
+
+      if (item.type === "item") {
+        return <MenuItemRow item={item.item} />;
+      }
+
+      if (item.type === "subsection-item") {
+        return <MenuItemRow item={item.item} isSubsection />;
+      }
+
+      return null;
+    },
+    [
+      headerSpacerStyle,
+      currentShop,
+      changeShop,
+      scrollY,
+      scrollThresholdSv,
+      menuData,
+      activeIndex,
+      onChipPress,
+      onToggleSubsection,
+      openMenu,
+    ]
+  );
+
+  const snapPoints = useMemo(() => ["50%", "80%"], []);
+
+  return (
+    <View className="flex-1 z-10 bg-white">
+      <AnimatedFlashList
+        ref={flashListRef as any}
+        data={extendedData}
+        keyExtractor={(item: any) => item.id}
+        renderItem={renderItem as any}
+        getItemType={(item: any) => item.type}
+        stickyHeaderIndices={[1]}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        estimatedItemSize={120}
+        viewabilityConfig={viewabilityConfig}
+        onViewableItemsChanged={onViewableItemsChanged}
+      />
+
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+      >
+        <View className="flex-1 bg-white">
+          <View className="px-5 py-4 border-b border-gray-200 flex-row justify-between items-center">
+            <Text className="text-xl font-bold text-gray-900">Menu</Text>
+            <TouchableOpacity onPress={closeMenu} className="p-1">
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+            {menuData.map((section, sIdx) => {
+              let secTotalCount = section.items.length;
+              section.subsections.forEach((sub) => (secTotalCount += sub.items.length));
+
+              return (
+                <View key={section.id} className="border-b border-gray-100">
+                  <TouchableOpacity
+                    className="flex-row justify-between items-center px-5 py-4"
+                    onPress={() => onMenuSelect(sIdx)}
+                  >
+                    <Text className="text-base font-bold text-gray-800">{section.title}</Text>
+                    <Text className="text-sm font-semibold text-gray-500">{secTotalCount}</Text>
+                  </TouchableOpacity>
+
+                  {section.subsections.map((sub) => (
+                    <TouchableOpacity
+                      key={sub.id}
+                      className="flex-row justify-between items-center pl-10 pr-5 py-3 bg-gray-50"
+                      onPress={() => onMenuSelect(sIdx, sub.id)}
+                    >
+                      <Text className="text-sm font-medium text-gray-600">{sub.title}</Text>
+                      <Text className="text-xs font-semibold text-gray-400">{sub.items.length}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              );
+            })}
+          </BottomSheetScrollView>
+        </View>
+      </BottomSheetModal>
+    </View>
+  );
+};
+
+export default RestaurantShop;
